@@ -1,4 +1,6 @@
 # Covid-19
-Non-exhaustive upgraded SEIR model to estimate stuff
+Assessing repression strategies against epidemic outbreak
 
-The code is not clean, but helps to get a first insight on what can be tested to face different questions and scenarios
+Code and analysis
+
+The other file is some messy triels for backup
