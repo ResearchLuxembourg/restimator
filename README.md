@@ -1,8 +1,8 @@
 # Covid-19
 
-## ![](https://latex.codecogs.com/svg.latex?\inline&space;R_{eff}) estimation
+## *R<sub>eff</sub>* estimation
 
-Daily estimation of ![](https://latex.codecogs.com/svg.latex?\inline&space;R_{eff}) for Luxembourg.
+Daily estimation of *R<sub>eff</sub>* for Luxembourg.
 Code inherited from Kevin Systrom's (https://github.com/k-sys/covid-19). Refer to his version for comprehensive explanation.
 
 In this repository, we present a streamed pipeline for estimation and plotting, following algorithms described in the above notebook. It also implements simple nowcasting.
