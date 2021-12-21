@@ -8,6 +8,9 @@ Created on Mon Dec 20 09:38:41 2021
 Code to monitor the COVID-19 epiddemic in Luxembourg and estimate useful 
 indicators for the Ministry of Health and the Taskforce WP6.
 
+Path to input file at line 186
+Path to output file at line 242; to output plot at line 260
+
 """
 
 # ----- 
@@ -27,12 +30,9 @@ from matplotlib.dates import date2num, num2date
 from matplotlib import dates as mdates
 from matplotlib import ticker
 from matplotlib.colors import ListedColormap
-from matplotlib.patches import Patch
 
 from scipy import stats as sps
 from scipy.interpolate import interp1d
-
-from IPython.display import clear_output
 
 
 # ----- global variables for data analysis
@@ -130,56 +130,7 @@ def get_posteriors(sr, date, sigma=0.15):
 # Prepare the plots
 #
 # -----
-    
-# ----- For data about all tested cases
-def plot_rt_all(result, ax, state_name):
-
-        # Colors
-        ABOVE = [0.9,0,0]
-        MIDDLE = [1,1,1]
-        BELOW = [0,0,0]
-        vals = np.ones((25, 3))
-        vals1 = np.ones((25, 3))
-        vals[:, 0] = np.linspace(BELOW[0], MIDDLE[0], 25)
-        vals[:, 1] = np.linspace(BELOW[1], MIDDLE[1], 25)
-        vals[:, 2] = np.linspace(BELOW[2], MIDDLE[2], 25)
-        vals1[:, 0] = np.linspace(MIDDLE[0], ABOVE[0], 25)
-        vals1[:, 1] = np.linspace(MIDDLE[1], ABOVE[1], 25)
-        vals1[:, 2] = np.linspace(MIDDLE[2], ABOVE[2], 25)
-
-        cmap = ListedColormap(np.r_[vals,vals1])
-        color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
-
-        index = result['R_t-estimate'].index.get_level_values('report_date')
-        values = result['R_t-estimate'].values
-
-        # Plot dots and line
-        ax.plot(index, values, c='k', zorder=1, alpha=.25)
-        ax.scatter(index,values,s=40,lw=.5,c=cmap(color_mapped(values)),edgecolors='k', zorder=2)
-
-        # Aesthetically, extrapolate credible interval by 1 day either side
-        lowfn = interp1d(date2num(index),result['Low_50'].values,bounds_error=False,fill_value='extrapolate')
-        highfn = interp1d(date2num(index),result['High_50'].values,bounds_error=False,fill_value='extrapolate')
-        extended = pd.date_range(start=pd.Timestamp('2020-03-01'),
-                                 end=index[-1]+pd.Timedelta(days=1))
-
-        ax.fill_between(extended,lowfn(date2num(extended)),highfn(date2num(extended)),color='k',alpha=.1,lw=0,zorder=3)
-        ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
-
-        # Formatting
-        ax.xaxis.set_major_locator(mdates.MonthLocator())
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-        ax.xaxis.set_minor_locator(mdates.DayLocator())
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-        ax.spines['right'].set_visible(False)
-        ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-        ax.margins(0)
-        ax.set_ylim(0.0, 3.0)
-        ax.set_xlim(result.index.get_level_values('report_date')[2], result.index.get_level_values('report_date')[-1]+pd.Timedelta(days=1))
-        fig1.set_facecolor('w')
-    
-
+ 
 # ----- for residents data only
 def plot_rt_residents(result, ax, state_name):
 
@@ -236,7 +187,7 @@ def plot_rt_residents(result, ax, state_name):
   
 while True:
     try:      
-        path = "/Users/daniele.proverbio/Downloads/clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file (see comment in .pptx file !!! )
+        path = "clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file
         full_data = pd.read_excel(path).iloc[::-1].reset_index()
         break
     except ValueError:
@@ -258,8 +209,6 @@ if dates_detection[1]>dates_detection[2]:
     raise ValueError('Warning: data are sorted incorrectly')  # In principle, this can be easily solved with a sort function; however, other people read those data in an agreed formmat an it's important to doublecheck
 
 
-# ---- Decide what to do with wastewater data !!!
-
 # -----
 #
 # Analysis
@@ -270,47 +219,27 @@ if dates_detection[1]>dates_detection[2]:
 
 # ----- Prepare data for analysis
 
-for i in [1,2]:
-    if i == 1:
-        cases = data_df.new_cases.cumsum()
-    elif i == 2:
-        cases = data_df.new_cases_resident.cumsum()
-    original, smoothed = prepare_cases(cases)
+cases = data_df.new_cases_resident.cumsum()
+original, smoothed = prepare_cases(cases)
 
-    #convert into array for easier handling
-    original_array = original.values
-    smoothed_array = smoothed.values
+#convert into array for easier handling
+original_array = original.values
+smoothed_array = smoothed.values
 
 # ----- R_eff estimation
 
-    R_T_MAX = 10
-    r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
+R_T_MAX = 10
+r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 
-    posteriors, log_likelihood = get_posteriors(smoothed_array, dates, sigma=.15)    #optimal sigma already chosen in original Notebook
+posteriors, log_likelihood = get_posteriors(smoothed_array, dates, sigma=.15)    #optimal sigma already chosen in original Notebook
 
-    # Note that this is not the most efficient algorithm, but works fine
-    hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, p=50%
+# Note that this is not the most efficient algorithm, but works fine
+hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, p=50%
 
-    most_likely = posteriors.idxmax().rename('R_t-estimate')   # mean R_eff value
-    
-    if i == 1:
-        result_all = pd.concat([most_likely, hdis], axis=1)    # global result for R_eff-estimate
-    elif i == 2:
-        result = pd.concat([most_likely, hdis], axis=1)  
-        result.to_csv('/Users/daniele.proverbio/python-workspace/PhD/covid-19/R_t/R_t-estimation/plots_results/simulation_danieleproverbio_'+today+'_rt-estimate.csv')   # decide on a name and specify path !!!
+most_likely = posteriors.idxmax().rename('R_t-estimate')   # mean R_eff value
 
-
-# ----- What's the probability of R>1? Check also scenarios: if R -> R + 0.1, if R -> R + 0.2
-
-current_prob = np.round(posteriors.iloc[100:,-1:].cumsum().iloc[-1,0] , 2)
-pess_prob = np.round(posteriors.iloc[90:,-1:].cumsum().iloc[-1,0] , 2)
-pess_pess_prob = np.round(posteriors.iloc[80:,-1:].cumsum().iloc[-1,0] , 2)
-
-current_prob1 = np.round(posteriors.iloc[100:,:].cumsum().iloc[-1] , 2)
-smooth_prob = current_prob1.rolling(7,min_periods=1,center=True).mean()
-
-
-# ----- Fit wastewater data? Incorporate the possibility of a changepoint !!!
+result = pd.concat([most_likely, hdis], axis=1)  
+result.to_csv('simulation_danieleproverbio_'+today+'_rt-estimate.csv')   # decide on a name and specify path !!!
 
 
 # -----
@@ -318,17 +247,6 @@ smooth_prob = current_prob1.rolling(7,min_periods=1,center=True).mean()
 # Plots
 #
 # -----
-
-# ----- R_eff for all cases
-fig1, ax3 = plt.subplots(figsize=(600/72,400/72))
-fig1.autofmt_xdate()
-plot_rt_all(result_all, ax3, state_name)
-ax3.set_title(f'Real-time effective $R_t$ for {state_name}')
-ax3.xaxis.set_major_locator(mdates.WeekdayLocator())
-ax3.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-
-fig1.savefig("/Users/daniele.proverbio/python-workspace/PhD/covid-19/R_t/R_t-estimation/plots_results/simulation_danieleproverbio_"+today+"_rt.pdf",bbox_inches = "tight",transparent=True) # check if we want it and set path !!!
-
 
 # ----- R_eff for residents' data
 
@@ -339,8 +257,5 @@ ax2.set_title(f'Real-time effective $R_t$ for {state_name}')
 ax2.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 
-fig.savefig("/Users/daniele.proverbio/python-workspace/PhD/covid-19/R_t/R_t-estimation/plots_results/simulation_danieleproverbio_"+today+"_rt_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
-
-
-# For all other plots, see what we decide about the webpage format and the use of wastewater data; also set the plots aspect once and for all
+fig.savefig("simulation_danieleproverbio_"+today+"_rt_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
 
