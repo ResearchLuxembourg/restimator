@@ -31,7 +31,7 @@ R_eff is estimated from the data following a Bayesian inference algorithm. In a 
 
 The algorithm returns a most likely value and its associated 50% credible interval (where there is the highest confidence that the true value might lie).
 
-The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/). Further information can be found on our [initial commit](https://github.com/ResearchLuxembourg/covid-19_reproductionNumber/blob/master/src/estimation_R_eff.ipynb).
+The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/). 
 
 ### R(t)
 R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
