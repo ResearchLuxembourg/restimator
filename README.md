@@ -2,17 +2,16 @@
 
 ## Input:
 Excel (.xlsx) file with at least the following columns, ordered chronologically (closest to farthest date):
-- Report date
+- report_date
 - new_cases
 - new_cases_resident
 
-
 ## Output
-R_eff, calculated for each day data are available (reported as .csv file and pdf plot)
-
+- R_eff, calculated for each day data are available (reported as .csv file and pdf plot)
+- R(t), calculated for each day data are available (reported as .csv file)
 
 ## Brief explanation of the indicator
- and related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
+and related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
 
 ### R0:
 the “basic reproduction number” at the beginning of epidemic (time "zero"). It represents the average number of cases each infected person will likely cause if no action is taken and the whole population is susceptible. It is disease and variant-specific.
@@ -25,7 +24,6 @@ the “effective reproduction number”, signifying the average number of cases 
 
 R_eff is used as an epidemic “thermometer”: R_eff<1 indicates a decreasing curve of daily infections (sub-linear increase of cumulative cases), R_eff=1 indicates a stable curve (linear increase of cumulative cases), R_eff>1 indicates a growing daily curve (exponential increase of cumulative cases). The higher R_eff, the more pronounced the exponential growth.
 
-
 ## Estimation
 
 ### R_eff
@@ -35,25 +33,16 @@ The algorithm returns a most likely value and its associated 50% credible interv
 
 The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/). Further information can be found on our [initial commit](https://github.com/ResearchLuxembourg/covid-19_reproductionNumber/blob/master/src/estimation_R_eff.ipynb).
 
-### Potential sources of code errors
+### R(t)
+R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
+
+## Potential sources of code errors
 - Missing daily data: the program needs a data entry for each day.
 - Typos in the input file (in particular, relate to the input columns labels).
 - Flipped data reporting order: make sure that line 1 contains the most recent data value, line 2 the one from yesterday, and so on until the farthest one. The order should not be inverted.
 - Retrospectively changed data. To provide consistent results, the program needs initial conditions: the data history should not be altered.
 
-[ - File name warning (see .pptx comments) ]
-
-
 [add additional info depending on the FAQ collected during daily practice]
-
-
-## Additional estimates
-
-The workpackage 6 of the national COVIID-19 Taskforce needs additional estimates for its weekly report to authorities. They include:
-- Probability that R_eff is > 1. As described above, R_eff comes with an associated uncertainty. It is then used to calculate the total probability that R_eff>1, corresponding to exponential growth.
-- Trends of hospitalisation and ICU
-
-[ - include ww if necessary ]
 
 
 # Credits and contacts
@@ -63,7 +52,6 @@ The workpackage 6 of the national COVIID-19 Taskforce needs additional estimates
 - [Atte if we include his code]
 - [credits to R3 team for website development and deployment]
 - [UniLu/LCSB: website hosting and maintenance?]
-
 
 For raised warnings and errors, check the readme section first, for basic troubleshooting.
 If the problem persist, please contact the developers.
