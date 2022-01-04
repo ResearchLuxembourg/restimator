@@ -1,2 +1,5 @@
+.DS_Store
+output/*
+!output/.gitkeep
 data/*
 !data/.gitkeep
