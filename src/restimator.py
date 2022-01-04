@@ -5,7 +5,7 @@ Created on Mon Dec 20 09:38:41 2021
 
 @author: daniele.proverbio
 
-Code to monitor the COVID-19 epiddemic in Luxembourg and estimate useful 
+Code to monitor the COVID-19 epiddemic in Luxembourg and estimate useful
 indicators for the Ministry of Health and the Taskforce WP6.
 
 Path to input file at line 186
@@ -13,7 +13,7 @@ Path to output file at line 242; to output plot at line 260
 
 """
 
-# ----- 
+# -----
 #
 # Preliminary settings
 #
@@ -39,7 +39,7 @@ from scipy.interpolate import interp1d
 FILTERED_REGION_CODES = ['LU']
 state_name = 'LU'
 today = DT.datetime.now().strftime("%Y%m%d")
-idx_start =22 # Initial condition, over the first wave in March
+idx_start = 22 # Initial condition, over the first wave in March
 
 # ----- some preparation to make sure data are ok
 def prepare_cases(cases, cutoff=25):   # prepare data, to get daily cases and smoothing
@@ -47,10 +47,10 @@ def prepare_cases(cases, cutoff=25):   # prepare data, to get daily cases and sm
     if new_cases.any() < 0:            # raise exception: some day is skipped, or data are input incorrectly
         raise ValueError('Problem with data: negative new cases encountered')
 
-    smoothed = new_cases.rolling(7, 
+    smoothed = new_cases.rolling(7,
         min_periods=1,
         center=False).mean().round()
-    
+
     smoothed = smoothed.iloc[idx_start:]
     original = new_cases.loc[smoothed.index]
 
@@ -63,15 +63,15 @@ def highest_density_interval(pmf, p=.9, debug=False):
     if(isinstance(pmf, pd.DataFrame)):
         return pd.DataFrame([highest_density_interval(pmf[col], p=p) for col in pmf],
                             index=pmf.columns)
-    
-    cumsum = np.cumsum(pmf.values)   
-    total_p = cumsum - cumsum[:, None]    # N x N matrix of total probability mass for each low, high   
+
+    cumsum = np.cumsum(pmf.values)
+    total_p = cumsum - cumsum[:, None]    # N x N matrix of total probability mass for each low, high
     lows, highs = (total_p > p).nonzero() # Return all indices with total_p > p
     best = (highs - lows).argmin()        # Find the smallest range (highest density)
-    
+
     low = pmf.index[lows[best]]
     high = pmf.index[highs[best]]
-    
+
     return pd.Series([low, high],index=[f'Low_{p*100:.0f}',f'High_{p*100:.0f}'])
 
 # -----  getting posteriors for R_t evaluation
@@ -80,19 +80,19 @@ def get_posteriors(sr, date, sigma=0.15):
     # (1) Calculate Lambda (average arrival rate from Poisson process)
     gamma=1/np.random.normal(4, 0.2, len(r_t_range)) # COVID-19 serial interval, with uncertainty
     lam = sr[:-1] * np.exp(gamma[:, None] * (r_t_range[:, None] - 1))
-    
+
     # (2) Calculate each day's likelihood
     likelihoods = pd.DataFrame(
         data = sps.poisson.pmf(sr[1:], lam),
         index = r_t_range,
         columns = date[1:])
-    
+
     # (3) Create the Gaussian Matrix
-    process_matrix = sps.norm(loc=r_t_range,scale=sigma).pdf(r_t_range[:, None]) 
+    process_matrix = sps.norm(loc=r_t_range,scale=sigma).pdf(r_t_range[:, None])
 
     # (3a) Normalize all rows to sum to 1
     process_matrix /= process_matrix.sum(axis=0)
-    
+
     # (4) Calculate the initial prior
     prior0 = np.ones_like(r_t_range)/len(r_t_range)
     prior0 /= prior0.sum()
@@ -100,7 +100,7 @@ def get_posteriors(sr, date, sigma=0.15):
     # Create a DataFrame that will hold our posteriors for each day
     # Insert our prior as the first posterior.
     posteriors = pd.DataFrame(index=r_t_range,columns=date,data={date[0]: prior0})
-    
+
     # Keep track of the sum of the log of the probability of the data for maximum likelihood calculation.
     log_likelihood = 0.0
 
@@ -109,28 +109,28 @@ def get_posteriors(sr, date, sigma=0.15):
 
         #(5a) Calculate the new prior
         current_prior = process_matrix @ posteriors[previous_day]
-        
+
         #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
         numerator = likelihoods[current_day] * current_prior
-        
+
         #(5c) Calcluate the denominator of Bayes' Rule P(k)
         denominator = np.sum(numerator)
-        
+
         # Execute full Bayes' Rule
         posteriors[current_day] = numerator/denominator
-        
+
         # Add to the running sum of log likelihoods
         log_likelihood += np.log(denominator)
-    
+
     return posteriors, log_likelihood
 
 
 # -----
-#    
+#
 # Prepare the plots
 #
 # -----
- 
+
 # ----- for residents data only
 def plot_rt_residents(result, ax, state_name):
 
@@ -138,7 +138,7 @@ def plot_rt_residents(result, ax, state_name):
         ABOVE = [1,0,0]
         MIDDLE = [1,1,1]
         BELOW = [0.5,0.8,0.9]
-        
+
         vals = np.ones((25, 3))
         vals1 = np.ones((25, 3))
         vals[:, 0] = np.linspace(BELOW[0], MIDDLE[0], 25)
@@ -184,20 +184,19 @@ def plot_rt_residents(result, ax, state_name):
 # Input data
 #
 # -----
-  
+
 while True:
-    try:      
-        path = "clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file
-        full_data = pd.read_excel(path).iloc[::-1].reset_index()
+    try:
+        path = "data/clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file
+        full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
         break
     except ValueError:
          print("File name not recognised")
 
 while True:
     try:
-        data_df = pd.DataFrame(full_data, 
+        data_df = pd.DataFrame(full_data,
                        columns =['report_date','new_cases','positive_patients_intensive_care','positive_patients_normal_care', 'covid_patients_dead', 'new_cases_resident','tests_done_resident'])
-        data_df = data_df.set_index(data_df.report_date + DT.timedelta(days=1)) # adjust dates
         break
     except ValueError:
         print("Possible typo in columns names")
@@ -212,7 +211,7 @@ if dates_detection[1]>dates_detection[2]:
 # -----
 #
 # Analysis
-# 
+#
 # -----
 
 #estimate R_eff for detection
@@ -238,7 +237,8 @@ hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, 
 
 most_likely = posteriors.idxmax().rename('R_t-estimate')   # mean R_eff value
 
-result = pd.concat([most_likely, hdis], axis=1)  
+result = pd.concat([most_likely, hdis], axis=1)
+result = result.set_index(data_df.report_date.iloc[idx_start:])
 result.to_csv('simulation_danieleproverbio_'+today+'_rt-estimate.csv')   # decide on a name and specify path !!!
 
 
