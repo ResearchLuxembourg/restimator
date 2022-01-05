@@ -2,6 +2,12 @@ logFileDir := 'logs'
 resultDir := 'output'
 tag := 'covid19'
 
+logFile := 'logs/launch.log' # name of log file
+matlab := '/usr/local/bin/matlab' # matlab executable, default: /usr/local/bin/matlab
+mountDir := 'covid19-reproductionNumber'
+
+current_dir = $(shell pwd)
+
 .PHONY: default run build
 
 all: clean build
@@ -12,8 +18,18 @@ build:
 	@make -s tag
 	@make -s clean
 
-run:
-	@sh run_pipeline.sh
+run: reff rt
+
+reff:
+	@echo " + Staring Reff estimation ..." >> ${logFile}
+	@docker run -v $(current_dir)/output:/${mountDir}/output ${tag}
+	@echo " + Reff estimation done." >> ${logFile}
+
+rt:
+	@echo " + Staring Rt estimation ..." >> ${logFile}
+	@${matlab} -nodesktop -nosplash -nodisplay -nojvm -r "run('src/rt_estimator.m'); exit();" >> ${logFile}
+	@echo " + Rt estimation done." >> ${logFile}
+	@echo " ----------------------------" >> ${logFile}
 
 clean:
 	@rm -rf ${resultDir}/*
