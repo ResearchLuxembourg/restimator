@@ -31,7 +31,7 @@ R_eff is estimated from the data following a Bayesian inference algorithm. In a 
 
 The algorithm returns a most likely value and its associated 50% credible interval (where there is the highest confidence that the true value might lie).
 
-The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/). 
+The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/).
 
 ### R(t)
 R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
@@ -71,3 +71,26 @@ If the problem persist, please contact the developers.
 >  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 >  See the License for the specific language governing permissions and
 >  limitations under the License.
+
+
+# How to run the pipeline
+
+Build the docker image using:
+
+```bash
+docker build -t covid19 .
+```
+
+Then, run the analysis:
+
+```bash
+docker run -v $(pwd)/output:/covid19/output covid19
+```
+
+# Run the pipeline properly speaking
+
+From the root directory, run:
+
+```bash
+./run_pipeline.sh
+```
