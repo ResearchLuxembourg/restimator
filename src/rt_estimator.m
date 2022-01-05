@@ -1,14 +1,34 @@
 %% Atte Aalto
 
-outputPath = ['..' filesep 'output' filesep]; % path where the output csv-file is saved (string)
+% change to the root of the file
+pathToFile = fileparts(mfilename('fullpath'));
+if ~isempty(pathToFile)
+    rootFolder = [pathToFile filesep '..'];
+else
+    rootFolder = pwd();
+end
+
+cd(rootFolder);
+addpath(genpath(rootFolder));
+
+% define output folder
+outFolder = [rootFolder filesep 'output'];
+checkFolder(outFolder);
+inFolder = [rootFolder filesep 'input'];
+checkFolder(inFolder);
 
 %Read input data
 today = datestr(clock, 29);
-TTin = readtable(['..' filesep 'input' filesep '' today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx']);
+inFile = [inFolder filesep today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx'];
+if isfile(inFile)
+    TTin = readtable(inFile);
+else
+    error(['The input file ' inFile ' cannot be found.']);
+end
 
 day0 = find(datetime(2020,2,28) == TTin.report_date);
 if isempty(day0)
-    error('Insufficient input file: Data from the start date, 28 February 2020, not found.')
+    error('Insufficient input file: Data from the start date, 28 February 2020, not found.');
 end
 Y = flipud(TTin.new_cases_resident(1:day0))';
 
@@ -52,6 +72,7 @@ C(3:7:end) = mon*ones(size(C(3:7:end))); %Mondays
 C(1:94) = C(1:94)/darkNumber_1;
 
 %Tune the coefficients for the weekly rhythm based on the last four weeks
+fprintf(' > Tune coefficients ... ')
 for jt = 95:length(C)
     weekDay = mod(jt-3,7) + 1;
 
@@ -61,6 +82,7 @@ for jt = 95:length(C)
     end
     C(jt) = dayCoef;
 end
+fprintf('Done.\n')
 
 % Some special holidays
 %2020
@@ -183,6 +205,8 @@ for jday=1:Tlim
 
 end
 
+disp(' > Simulation done.')
+
 % Create the output csv-file
 [dates, longdates, day, month, firsts, labs] = createDates;
 M = [X(4,20:end)/mu; err_beta(19:end).^.5/mu];
@@ -191,5 +215,6 @@ Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
 writetable(TTout,filename)
-movefile(filename,outputPath)
+movefile(filename,outFolder)
 
+disp([' > Outputfile written to ' outFolder])
