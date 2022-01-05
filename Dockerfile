@@ -6,7 +6,7 @@ RUN mkdir /covid19-reproductionNumber
 ADD . /covid19-reproductionNumber
 WORKDIR /covid19-reproductionNumber
 
-COPY requirements.txt /covid19-reproNumber/requirements.txt
+COPY requirements.txt /covid19-reproductionNumber/requirements.txt
 RUN pip install -r requirements.txt
 
 CMD ["python", "src/reff_estimator.py"]

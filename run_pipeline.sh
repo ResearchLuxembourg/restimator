@@ -5,7 +5,7 @@ matlab="/usr/local/bin/matlab" # matlab executable, default: /usr/local/bin/matl
 
 # Python pipeline - Estimation of Reff
 echo " + Staring Reff estimation ..." >> $logFile
-docker run -v $(pwd)/output:/covid19/output covid19
+docker run -v $(pwd)/output:/covid19-reproductionNumber/output covid19
 echo " + Reff estimation done." >> $logFile
 
 # MATLAB pipeline - Estimation of Rt
