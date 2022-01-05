@@ -1,28 +1,19 @@
 function [dates, longdates, day, month, firsts, labs] = createDates()
 
-
 %Check the date for csv file names
-a=clock;
-day=num2str(a(3));
-month=num2str(a(2));
-if length(day) == 1
-    day=['0' day];
-end
-if length(month) == 1
-    month=['0' month];
-end
-
+day = datestr(clock, 7);
+month = datestr(clock, 5);
 
 %Create dates for plot axes
 dates={'29/2'};
 monthLengths = [31 28 31 30 31 30 31 31 30 31 30 31];
 firsts=[2,2+cumsum(monthLengths(3:end)),2+sum(monthLengths(3:end))+cumsum(monthLengths), 2+sum(monthLengths(3:end))+sum(monthLengths)+cumsum(monthLengths)];
-for jm = [3:12 1:12 1:12] 
+for jm = [3:12 1:12 1:12]
     for jd = 1:monthLengths(jm)
         dates={dates{1:length(dates)},[num2str(jd) '/' num2str(jm)]};
     end
 end
-for jt=1:length(firsts)-1  
+for jt=1:length(firsts)-1
     if mod(jt,2) == 1
         labs{jt} = dates{firsts(jt)};
     else
