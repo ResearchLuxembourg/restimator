@@ -81,14 +81,10 @@ If the problem persist, please contact the developers.
 
 ## How to run the pipeline
 
-First, build the pipeline:
-
-```bash
-make build
-```
-
-Then, run the pipeline
-
-```
-make run
-```
+| Command | Purpose |
+|---------------|------------|
+| make build | build the pipeline |
+| make run | run the pipeline |
+| make clean | clean generated assets |
+| make reff | run the partial pipeline to generate R_eff (Python) |
+| make rt | run the partial pipeline to generate Rt (Matlab) |
