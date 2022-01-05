@@ -28,7 +28,7 @@ from scipy import stats as sps
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
 from matplotlib.dates import date2num
-import plot_rt_estimate
+import plot_reff_estimate
 
 # ----- global variables for data analysis
 FILTERED_REGION_CODES = ['LU']
@@ -193,7 +193,7 @@ result.to_csv('output/'+today+'_Reff-estimate.csv')   # decide on a name and spe
 
 fig, ax2 = plt.subplots(figsize=(800/72,400/72))
 fig.autofmt_xdate(rotation=90)
-plot_rt_estimate.plot_rt_residents(result, ax2, state_name, fig)
+plot_reff_estimate.plot_rt_residents(result, ax2, state_name, fig)
 ax2.set_title(f'Real-time effective $R_t$ for {state_name}')
 ax2.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
