@@ -81,22 +81,14 @@ If the problem persist, please contact the developers.
 
 ## How to run the pipeline
 
-Build the docker image using:
+First, build the pipeline:
 
 ```bash
-docker build -t covid19 .
+make build
 ```
 
-Then, run the analysis:
+Then, run the pipeline
 
-```bash
-docker run -v $(pwd)/output:/covid19-reproductionNumber/output covid19-reproductionNumber
 ```
-
-Run the pipeline properly speaking
-
-From the root directory, run:
-
-```bash
-./run_pipeline.sh
+make run
 ```
