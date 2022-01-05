@@ -1,10 +1,10 @@
-logFileDir := 'logs'
-resultDir := 'output'
-tag := 'covid19'
+logFileDir := 'logs' # name of directory for logging
+resultDir := 'output' # name of output directory
+tag := 'covid19' # tag of docker image
 
-logFile := 'logs/launch.log' # name of log file
+logFile :='${logFileDir}/launch.log' # name of log file
 matlab := '/usr/local/bin/matlab' # matlab executable, default: /usr/local/bin/matlab
-mountDir := 'covid19-reproductionNumber'
+mountDir := 'covid19-reproductionNumber' # name of mounted directory in Dockerfile
 
 current_dir = $(shell pwd)
 
