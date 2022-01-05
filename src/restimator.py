@@ -175,11 +175,11 @@ posteriors, log_likelihood = get_posteriors(smoothed_array, dates, sigma=.15)   
 # Note that this is not the most efficient algorithm, but works fine
 hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, p=50%
 
-most_likely = posteriors.idxmax().rename('R_eff-estimate')   # mean R_eff value
+most_likely = posteriors.idxmax().rename('Reff-estimate')   # mean R_eff value
 
 result = pd.concat([most_likely, hdis], axis=1)
 result = result.set_index(data_df.report_date.iloc[idx_start:])
-result.to_csv('output/'+today+'_r_eff-estimate.csv')   # decide on a name and specify path !!!
+result.to_csv('output/'+today+'_Reff-estimate.csv')   # decide on a name and specify path !!!
 
 
 
@@ -198,5 +198,5 @@ ax2.set_title(f'Real-time effective $R_t$ for {state_name}')
 ax2.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 
-fig.savefig("output/"+today+"_r_eff_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
+fig.savefig("output/"+today+"_Reff_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
 

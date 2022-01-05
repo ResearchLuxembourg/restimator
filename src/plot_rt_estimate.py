@@ -33,8 +33,8 @@ def plot_rt_residents(result, ax, state_name, fig):
         cmap = ListedColormap(np.r_[vals,vals1])
         color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
 
-        index = result['R_eff-estimate'].index.get_level_values('report_date')
-        values = result['R_eff-estimate'].values
+        index = result['Reff-estimate'].index.get_level_values('report_date')
+        values = result['Reff-estimate'].values
 
         # Plot dots and line
         ax.plot(index, values, c='k', zorder=1, alpha=.25)

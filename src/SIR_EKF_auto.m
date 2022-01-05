@@ -1,27 +1,16 @@
 %% Atte Aalto
 
-%Needed inputs:
-% inputFile = path to the input Excel table (string)
-% outputPath = path where the output csv-file is saved (string)
-inputFile = '../data/clinical_monitoring_20220104_cleaned_case_and_hospital_data.xlsx';
-outputPath = ['..' filesep 'output' filesep];
+outputPath = ['..' filesep 'output' filesep]; % path where the output csv-file is saved (string)
 
 %Read input data
-if exist('inputFile')
-    TTin = readtable(inputFile);
-else
-    a = clock;
-    TTin = readtable(['..' filesep 'data' filesep 'clinical_monitoring_' num2str(a(1)) num2str(a(2)) num2str(a(3)) '_cleaned_case_and_hospital_data.xlsx']);
-end
+today = datestr(clock, 29);
+TTin = readtable(['..' filesep 'input' filesep '' today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx']);
+
 day0 = find(datetime(2020,2,28) == TTin.report_date);
 if isempty(day0)
     error('Insufficient input file: Data from the start date, 28 February 2020, not found.')
 end
 Y = flipud(TTin.new_cases_resident(1:day0))';
-
-if ~exist('outputPath')
-    outputPath = './output/';
-end
 
 %Fixing some data anomalies (ad hoc)
 Y(138) = Y(138) + 40;
@@ -200,7 +189,7 @@ M = [X(4,20:end)/mu; err_beta(19:end).^.5/mu];
 TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
 Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
-filename = ['simulation_AtteAalto_2021' month day '_Rt_estimate.csv'];
+filename = [today '_Rt_estimate.csv'];
 writetable(TTout,filename)
 movefile(filename,outputPath)
 
