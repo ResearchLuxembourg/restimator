@@ -33,7 +33,7 @@ import plot_rt_estimate
 # ----- global variables for data analysis
 FILTERED_REGION_CODES = ['LU']
 state_name = 'LU'
-today = DT.datetime.now().strftime("%Y%m%d")
+today = DT.datetime.now().strftime("%Y-%m-%d")
 idx_start = 22 # Initial condition, over the first wave in March
 
 # ----- some preparation to make sure data are ok
@@ -127,7 +127,7 @@ def get_posteriors(sr, date, sigma=0.15):
 
 while True:
     try:
-        path = "input/clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file
+        path = "input/"+today+"_clinical_monitoring_cleaned_case_and_hospital_data.xlsx" #  specify path to file
         full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
         break
     except ValueError:
@@ -175,11 +175,11 @@ posteriors, log_likelihood = get_posteriors(smoothed_array, dates, sigma=.15)   
 # Note that this is not the most efficient algorithm, but works fine
 hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, p=50%
 
-most_likely = posteriors.idxmax().rename('R_t-estimate')   # mean R_eff value
+most_likely = posteriors.idxmax().rename('R_eff-estimate')   # mean R_eff value
 
 result = pd.concat([most_likely, hdis], axis=1)
 result = result.set_index(data_df.report_date.iloc[idx_start:])
-result.to_csv('output/simulation_danieleproverbio_'+today+'_rt-estimate.csv')   # decide on a name and specify path !!!
+result.to_csv('output/'+today+'_r_eff-estimate.csv')   # decide on a name and specify path !!!
 
 
 
@@ -198,5 +198,5 @@ ax2.set_title(f'Real-time effective $R_t$ for {state_name}')
 ax2.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 
-fig.savefig("output/simulation_danieleproverbio_"+today+"_rt_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
+fig.savefig("output/"+today+"_r_eff_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
 
