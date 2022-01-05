@@ -1,16 +1,24 @@
-logFileDir := 'logs' # name of directory for logging
-resultDir := 'output' # name of output directory
-tag := 'covid19' # tag of docker image
+# logs and result directories
+logFileDir := logs
+resultDir := output
 
-logFile :='${logFileDir}/launch.log' # name of log file
-matlab := '/usr/local/bin/matlab' # matlab executable, default: /usr/local/bin/matlab
-mountDir := 'covid19-reproductionNumber' # name of mounted directory in Dockerfile
+# tag of docker image
+tag := covid19
+
+# name of log file
+logFile :='logs/launch.log'
+
+# matlab executable, default: /usr/local/bin/matlab
+matlab := '/usr/local/bin/matlab'
+
+# name of mounted directory in Dockerfile
+mountDir := 'covid19-reproductionNumber'
 
 current_dir = $(shell pwd)
 
 .PHONY: default run build
 
-all: clean build
+all: clean build run
 
 build:
 	$(info Make: Building "$(tag)" tagged images.)
