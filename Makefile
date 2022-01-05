@@ -23,8 +23,6 @@ all: clean build run
 build:
 	$(info Make: Building "$(tag)" tagged images.)
 	@docker build -t ${tag} .
-	@make -s tag
-	@make -s clean
 
 run: reff rt
 
@@ -40,8 +38,9 @@ rt:
 	@echo " ----------------------------" >> ${logFile}
 
 clean:
-	@rm -rf ${resultDir}/*
+	@rm -rf ${resultDir}/*.pdf
+	@rm -rf ${resultDir}/*.csv
 	@echo " > Result files cleaned"
-	@rm -rf ${logFileDir}/*
+	@rm -rf ${logFileDir}/*.log
 	@echo " > log files cleaned"
 	@echo " > All files cleaned"
