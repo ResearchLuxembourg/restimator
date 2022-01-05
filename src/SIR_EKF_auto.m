@@ -1,15 +1,17 @@
 %% Atte Aalto
 
-%Needed inputs: 
+%Needed inputs:
 % inputFile = path to the input Excel table (string)
 % outputPath = path where the output csv-file is saved (string)
+inputFile = '../data/clinical_monitoring_20220104_cleaned_case_and_hospital_data.xlsx';
+outputPath = ['..' filesep 'output' filesep];
 
 %Read input data
 if exist('inputFile')
     TTin = readtable(inputFile);
 else
     a = clock;
-    TTin = readtable(['clinical_monitoring_' num2str(a(1)) num2str(a(2)) num2str(a(3)) '_cleaned_case_and_hospital_data.xlsx']);
+    TTin = readtable(['..' filesep 'data' filesep 'clinical_monitoring_' num2str(a(1)) num2str(a(2)) num2str(a(3)) '_cleaned_case_and_hospital_data.xlsx']);
 end
 day0 = find(datetime(2020,2,28) == TTin.report_date);
 if isempty(day0)
@@ -18,7 +20,7 @@ end
 Y = flipud(TTin.new_cases_resident(1:day0))';
 
 if ~exist('outputPath')
-    outputPath = './Results/';
+    outputPath = './output/';
 end
 
 %Fixing some data anomalies (ad hoc)
@@ -119,15 +121,15 @@ S_beta = .15^2;
 % Variance of daily change of beta (initially)
 Q_beta = .05^2;
 
-% State variables are: 
+% State variables are:
 % X(1): S(t),  X(2): I(t),  X(3): S(t-1),  X(4): beta(t)
 X = zeros(4,Tlim+1);
 X(:,1) = [N-N_infected; N_infected; N-N_infected+1; beta];
 
-% Initial state error covariance 
-P = [S_infected -S_infected S_infected 0; 
-    -S_infected S_infected -S_infected 0; 
-    S_infected -S_infected S_infected 0; 
+% Initial state error covariance
+P = [S_infected -S_infected S_infected 0;
+    -S_infected S_infected -S_infected 0;
+    S_infected -S_infected S_infected 0;
     0 0 0 S_beta];
 
 % Measurement error variance (depends on the number of infected)
@@ -138,7 +140,7 @@ Ysm(2:end-1) = .5*Y(2:end-1) + .25*(Y(1:end-2)+Y(3:end));
 R = (Ysm/25).^2.*(C(1)./C(1:length(Y))).^2 + 1;
 
 % Model error term to scale up the Langevin covariance
-CC = 4^2; 
+CC = 4^2;
 
 % Number of detected cases today depends linearly on the true number of new
 % cases today
@@ -147,56 +149,56 @@ C0 = [-1 0 1 0];
 Yest = zeros(1,Tlim); %Storage for predicted number of new cases
 err_beta = zeros(1,Tlim);  %Storage for beta-estimate error variance
 for jday=1:Tlim
-    
-    %Reduce the rate of change of beta-parameter after the effect of 
+
+    %Reduce the rate of change of beta-parameter after the effect of
     %lockdown has stabilised, since no bigger changes are expected anymore.
     if jday>30.5
         Q_beta=.005^2;
     end
-    
+
     %State update (Kalman filter prediction step):
     X(1,jday+1) = X(1,jday) - X(4,jday)*X(2,jday)*X(1,jday)/N;
     X(2,jday+1) = (X(2,jday) + X(4,jday)*X(2,jday)*X(1,jday)/N)/(1+mu);
     X(3,jday+1) = X(1,jday);
     X(4,jday+1) = X(4,jday);
-   
+
     %Jacobian of the dynamics function
     Jf = [1-X(4,jday)*X(2,jday)/N -X(4,jday)*X(1,jday)/N 0 -X(1,jday)*X(2,jday)/N;
         X(4,jday)*X(2,jday)/N (1+X(4,jday)*X(1,jday)/N)/(1+mu) 0 X(1,jday)*X(2,jday)/N;
         1 0 0 0;
         0 0 0 1];
-    
+
     %"Process noise" covariance, assuming Langevin-type stochastics
     Q = [CC*X(4,jday)*X(1,jday)*X(2,jday)/N, -CC*X(4,jday)*X(1,jday)*X(2,jday)/N, 0, 0;
         -CC*X(4,jday)*X(1,jday)*X(2,jday)/N, CC*(X(4,jday)*X(1,jday)*X(2,jday)/N + mu*X(2,jday)), 0, 0;
         0, 0, 0, 0;
         0, 0, 0, Q_beta];
-    
+
     %Prediction error covariance
     Phat = Jf*P*Jf' + Q;
-    
+
     %Measurement covariance
     S = C(jday)^2*C0*Phat*C0'+R(jday);
-   
+
     %Predicted number of daily new cases
     Yest(jday) = C(jday)*C0*X(:,jday+1);
-    
+
     %Kalman filter update step based on true and predicted number
     X(:,jday+1) = X(:,jday+1) + Phat*C(jday)*C0'*(Y(jday)-Yest(jday))/S;
-    
+
     %Covariance update
     P = Phat - C(jday)^2/S*Phat*C0'*C0*Phat;
-    
+
     %Store the error variance of beta-estimate
     err_beta(jday) = P(4,4);
-    
+
 end
-   
+
 % Create the output csv-file
 [dates, longdates, day, month, firsts, labs] = createDates;
 M = [X(4,20:end)/mu; err_beta(19:end).^.5/mu];
-TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});   
-Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});    
+TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
+Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = ['simulation_AtteAalto_2021' month day '_Rt_estimate.csv'];
 writetable(TTout,filename)
