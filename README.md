@@ -63,6 +63,7 @@ R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-bas
 | make reff     | run the partial pipeline to generate `R_eff` (Python) |
 | make rt       | run the partial pipeline to generate `R_t` (Matlab)   |
 | make clean    | clean generated assets                                |
+| make all      | clean first, then build and run the full pipeline     |
 # Credits and contacts
 
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
