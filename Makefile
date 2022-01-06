@@ -8,13 +8,15 @@ tag := covid19
 # name of log file
 logFile :='logs/launch.log'
 
-# matlab executable, default: /usr/local/bin/matlab
-matlab := '/usr/local/bin/matlab'
-
+current_dir = $(shell pwd)
 # name of mounted directory in Dockerfile
 mountDir := 'covid19-reproductionNumber'
 
-current_dir = $(shell pwd)
+# matlab executable, default: /usr/local/bin/matlab
+matlab_cmd := ''
+
+# working cmd
+#docker run -it -v $(pwd)/input:/home/matlab/covid19-reproductionNumber/input -v $(pwd)/output:/home/matlab/covid19-reproductionNumber/output -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M mymatlab matlab -r "run('src/rt_estimator.m'); exit();"
 
 .PHONY: default run build
 
@@ -33,7 +35,7 @@ reff:
 
 rt:
 	@echo " + Staring Rt estimation ..." >> ${logFile}
-	@${matlab} -nodesktop -nosplash -nodisplay -nojvm -r "run('src/rt_estimator.m'); exit();" >> ${logFile}
+	docker run -it -v $(current_dir)/output:/home/matlab/covid19-reproductionNumber/output -v $(current_dir)/input:/home/matlab/covid19-reproductionNumber/input -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M mymatlab matlab -r "run('src/rt_estimator.m'); exit();" >> ${logFile}
 	@echo " + Rt estimation done." >> ${logFile}
 	@echo " ----------------------------" >> ${logFile}
 
