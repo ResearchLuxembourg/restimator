@@ -3,7 +3,7 @@ output/*
 !output/.gitkeep
 input/*
 !input/.gitkeep
-
+requirements.txt
 
 # ignore configuration files
 *.cfg
