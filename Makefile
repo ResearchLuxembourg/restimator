@@ -28,7 +28,7 @@ run: reff rt
 
 reff:
 	@echo " + Staring Reff estimation ..." >> ${logFile}
-	@docker run -v $(current_dir)/output:/${mountDir}/output ${tag}
+	@docker run -v $(current_dir)/output:/${mountDir}/output -v $(current_dir)/input:/${mountDir}/input ${tag}
 	@echo " + Reff estimation done." >> ${logFile}
 
 rt:
