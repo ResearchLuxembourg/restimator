@@ -31,7 +31,7 @@ the “effective reproduction number”, signifying the average number of cases 
 
 R_eff is used as an epidemic “thermometer”: R_eff<1 indicates a decreasing curve of daily infections (sub-linear increase of cumulative cases), R_eff=1 indicates a stable curve (linear increase of cumulative cases), R_eff>1 indicates a growing daily curve (exponential increase of cumulative cases). The higher R_eff, the more pronounced the exponential growth.
 
-## Estimation
+## Estimation of R_eff and R_t
 
 ### R_eff
 
@@ -41,9 +41,9 @@ The algorithm returns a most likely value and its associated 50% credible interv
 
 The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/).
 
-### R(t)
+### R_t
 
-R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
+R_t is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
 
 ## Potential sources of code errors
 
@@ -56,6 +56,8 @@ R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-bas
 
 ## How to run the pipeline
 
+The pipeline can be run using any of the following `make` commands:
+
 | Command       | Purpose                                               |
 |---------------|-------------------------------------------------------|
 | make build    | build the pipeline                                    |
@@ -64,7 +66,14 @@ R_eff is estimated by running a Kalmar filter estimator with a nonlinear SIR-bas
 | make rt       | run the partial pipeline to generate `R_t` (Matlab)   |
 | make clean    | clean generated assets                                |
 | make all      | clean first, then build and run the full pipeline     |
-# Credits and contacts
+
+Alternatively, if [Docker Compose](https://docs.docker.com/compose/) is available, you can run the pipeline using:
+
+```bash
+docker compose up
+```
+
+## Credits and contacts
 
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
 - Daniele Proverbio: R_eff code development, website ideation and content creation
