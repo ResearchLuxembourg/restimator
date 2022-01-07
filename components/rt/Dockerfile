@@ -14,4 +14,3 @@ ADD src/* /home/matlab/covid19-reproductionNumber/src
 
 # execute the pipeline
 CMD ["matlab"]
-#CMD ["matlab","-batch","rt_estimator"]
