@@ -4,13 +4,9 @@ ARG DEFAULT_REG=""
 FROM ${DEFAULT_REG}/mathworks/matlab:r2021b
 
 # create the working directory
-RUN mkdir /home/matlab/covid19-reproductionNumber
+RUN mkdir -p /home/matlab/covid19-reproductionNumber
 WORKDIR /home/matlab/covid19-reproductionNumber
-
-# add source files
-RUN mkdir /home/matlab/covid19-reproductionNumber/src
-RUN mkdir /home/matlab/covid19-reproductionNumber/output
-RUN mkdir /home/matlab/covid19-reproductionNumber/input
+RUN mkdir -p src output input
 
 ADD src/* /home/matlab/covid19-reproductionNumber/src
 
