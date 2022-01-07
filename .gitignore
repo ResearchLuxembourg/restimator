@@ -4,7 +4,6 @@ output/*
 input/*
 !input/.gitkeep
 requirements.txt
-.dockerignore
 
 # ignore configuration files
 *.cfg
