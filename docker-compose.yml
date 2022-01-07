@@ -21,7 +21,6 @@ services:
     volumes:
       - ./input:/covid19-reproductionNumber/input/
       - ./output:/covid19-reproductionNumber/output/
-      - ./logs:/covid19-reproductionNumber/logs/
     networks:
       - covid-net
 
@@ -32,7 +31,6 @@ services:
     volumes:
       - ./input:/home/matlab/covid19-reproductionNumber/input/
       - ./output:/home/matlab/covid19-reproductionNumber/output/
-      - ./logs:/home/matlab/covid19-reproductionNumber/logs/
       - ./components/rt/src:/home/matlab/covid19-reproductionNumber/src/
       - ~/license-matlab.lic:/license.dat
     working_dir: /home/matlab/covid19-reproductionNumber
