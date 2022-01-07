@@ -6,6 +6,10 @@ resultDir := output
 tag_reff := covid19-reff
 tag_rt := covid19-rt
 
+# commands
+cmd_reff := python src/reff_estimator.py
+cmd_rt := matlab -r "run('src/rt_estimator.m'); exit();"
+
 datestamp := $(date +%FT%T%z)
 
 # name of log file
@@ -38,12 +42,12 @@ build_rt:
 
 reff:
 	@echo " [$$(date +%FT%T%z)] + Starting Reff estimation ..." >> ${logFile}
-	@docker run -v $(current_dir)/output:/${mountDir}/output -v $(current_dir)/input:/${mountDir}/input ${tag_reff}
+	@docker run -v $(current_dir)/output:/${mountDir}/output -v $(current_dir)/input:/${mountDir}/input ${tag_reff} ${cmd_reff} >> ${logFile}
 	@echo " [$$(date +%FT%T%z)] + Reff estimation done." >> ${logFile}
 
 rt:
 	@echo " [$$(date +%FT%T%z)] + Starting Rt estimation ..." >> ${logFile}
-	@docker run -it -v $(current_dir)/output:/home/matlab/covid19-reproductionNumber/output -v $(current_dir)/input:/home/matlab/covid19-reproductionNumber/input -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M ${tag_rt} matlab -r "run('src/rt_estimator.m'); exit();" >> ${logFile}
+	@docker run -it -v $(current_dir)/output:/home/matlab/covid19-reproductionNumber/output -v $(current_dir)/input:/home/matlab/covid19-reproductionNumber/input -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M ${tag_rt} ${cmd_rt} >> ${logFile}
 	@echo " [$$(date +%FT%T%z)] + Rt estimation done." >> ${logFile}
 
 clean:
