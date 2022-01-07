@@ -1,5 +1,7 @@
+ARG DEFAULT_REG="docker-registry.lcsb.uni.lu"
+
 # Build from the MATLAB base image
-FROM mathworks/matlab:r2021b
+FROM ${DEFAULT_REG}/mathworks/matlab:r2021b
 
 # create the working directory
 RUN mkdir /home/matlab/covid19-reproductionNumber
