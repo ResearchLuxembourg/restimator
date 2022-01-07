@@ -214,7 +214,6 @@ TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
 Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
-writetable(TTout,filename)
-movefile(filename,outFolder)
+writetable(TTout,[outFolder filesep filename])
 
 disp([' > Outputfile written to ' outFolder])
