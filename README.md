@@ -84,7 +84,7 @@ docker compose up
 For raised warnings and errors, check the readme section first, for basic troubleshooting.
 If the problem persist, please contact the developers.
 
-> Copyright 2020 Luxembourg Centre for Systems Biomedicine
+> Copyright 2020-2022 Luxembourg Centre for Systems Biomedicine
 >
 > Licensed under the Apache License, Version 2.0 (the "License");
 > you may not use this file except in compliance with the License.
