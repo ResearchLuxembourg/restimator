@@ -26,7 +26,9 @@ services:
 
   rt:
     logging: *default-logging
-    image: docker-registry.lcsb.uni.lu/mathworks/matlab:r2021b
+    build:
+      context: ./components/rt/
+      dockerfile: ./Dockerfile
     container_name: rt
     volumes:
       - ./input:/home/matlab/covid19-reproductionNumber/input/
