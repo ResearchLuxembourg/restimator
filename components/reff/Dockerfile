@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.9
-ARG DEFAULT_REG="docker-registry.lcsb.uni.lu"
+ARG DEFAULT_REG=""
 
 FROM ${DEFAULT_REG}/library/python:${PYTHON_VERSION}-slim
 
@@ -16,4 +16,4 @@ RUN mkdir /covid19-reproductionNumber/src
 ADD src/* /covid19-reproductionNumber/src
 
 # execute the pipeline
-CMD ["python", "src/reff_estimator.py"]
+CMD ["python"]
