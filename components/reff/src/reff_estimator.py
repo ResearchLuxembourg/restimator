@@ -24,21 +24,16 @@ Path to output file at line 242; to output plot at line 260
 import pandas as pd
 import numpy as np
 import datetime as DT
-
-from matplotlib import pyplot as plt
-from matplotlib.dates import date2num, num2date
-from matplotlib import dates as mdates
-from matplotlib import ticker
-from matplotlib.colors import ListedColormap
-
 from scipy import stats as sps
-from scipy.interpolate import interp1d
-
+from matplotlib import pyplot as plt
+from matplotlib import dates as mdates
+from matplotlib.dates import date2num
+import plot_reff_estimate
 
 # ----- global variables for data analysis
 FILTERED_REGION_CODES = ['LU']
 state_name = 'LU'
-today = DT.datetime.now().strftime("%Y%m%d")
+today = DT.datetime.now().strftime("%Y-%m-%d")
 idx_start = 22 # Initial condition, over the first wave in March
 
 # ----- some preparation to make sure data are ok
@@ -124,61 +119,6 @@ def get_posteriors(sr, date, sigma=0.15):
 
     return posteriors, log_likelihood
 
-
-# -----
-#
-# Prepare the plots
-#
-# -----
-
-# ----- for residents data only
-def plot_rt_residents(result, ax, state_name):
-
-        # Colors
-        ABOVE = [1,0,0]
-        MIDDLE = [1,1,1]
-        BELOW = [0.5,0.8,0.9]
-
-        vals = np.ones((25, 3))
-        vals1 = np.ones((25, 3))
-        vals[:, 0] = np.linspace(BELOW[0], MIDDLE[0], 25)
-        vals[:, 1] = np.linspace(BELOW[1], MIDDLE[1], 25)
-        vals[:, 2] = np.linspace(BELOW[2], MIDDLE[2], 25)
-
-        vals1[:, 0] = np.linspace(MIDDLE[0], ABOVE[0], 25)
-        vals1[:, 1] = np.linspace(MIDDLE[1], ABOVE[1], 25)
-        vals1[:, 2] = np.linspace(MIDDLE[2], ABOVE[2], 25)
-
-        cmap = ListedColormap(np.r_[vals,vals1])
-        color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
-
-        index = result['R_t-estimate'].index.get_level_values('report_date')
-        values = result['R_t-estimate'].values
-
-        # Plot dots and line
-        ax.plot(index, values, c='k', zorder=1, alpha=.25)
-        ax.scatter(index,values,s=30,lw=.5,c=cmap(color_mapped(values)),edgecolors='k', zorder=2)
-
-        lowfn = interp1d(date2num(index),result['Low_50'].values,bounds_error=False,fill_value='extrapolate')
-        highfn = interp1d(date2num(index),result['High_50'].values,bounds_error=False,fill_value='extrapolate')
-        extended = pd.date_range(start=pd.Timestamp('2020-03-01'),end=index[-1])
-
-        ax.fill_between(extended,lowfn(date2num(extended)),highfn(date2num(extended)),color='k',alpha=.1,lw=0,zorder=3)
-        ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
-
-        # Formatting
-        ax.xaxis.set_major_locator(mdates.MonthLocator())
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d'))
-        ax.xaxis.set_minor_locator(mdates.DayLocator())
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-        ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-        ax.margins(0)
-        ax.set_ylim(0.0, 2.5)
-        ax.set_xlim(result.index.get_level_values('report_date')[2], result.index.get_level_values('report_date')[-1])
-        fig.set_facecolor('w')
-
-
 # -----
 #
 # Input data
@@ -187,7 +127,7 @@ def plot_rt_residents(result, ax, state_name):
 
 while True:
     try:
-        path = "data/clinical_monitoring_"+today+"_cleaned_case_and_hospital_data.xlsx" #  specify path to file
+        path = "input/"+today+"_clinical_monitoring_cleaned_case_and_hospital_data.xlsx" #  specify path to file
         full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
         break
     except ValueError:
@@ -235,11 +175,12 @@ posteriors, log_likelihood = get_posteriors(smoothed_array, dates, sigma=.15)   
 # Note that this is not the most efficient algorithm, but works fine
 hdis = highest_density_interval(posteriors, p=.5)          # confidence bounds, p=50%
 
-most_likely = posteriors.idxmax().rename('R_t-estimate')   # mean R_eff value
+most_likely = posteriors.idxmax().rename('Reff-estimate')   # mean R_eff value
 
 result = pd.concat([most_likely, hdis], axis=1)
 result = result.set_index(data_df.report_date.iloc[idx_start:])
-result.to_csv('output/simulation_danieleproverbio_'+today+'_rt-estimate.csv')   # decide on a name and specify path !!!
+result.to_csv('output/'+today+'_Reff-estimate.csv')   # decide on a name and specify path !!!
+
 
 
 # -----
@@ -252,10 +193,10 @@ result.to_csv('output/simulation_danieleproverbio_'+today+'_rt-estimate.csv')   
 
 fig, ax2 = plt.subplots(figsize=(800/72,400/72))
 fig.autofmt_xdate(rotation=90)
-plot_rt_residents(result, ax2, state_name)
+plot_reff_estimate.plot_rt_residents(result, ax2, state_name, fig)
 ax2.set_title(f'Real-time effective $R_t$ for {state_name}')
 ax2.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 
-fig.savefig("output/simulation_danieleproverbio_"+today+"_rt_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
+fig.savefig("output/"+today+"_Reff_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
 
