@@ -5,7 +5,7 @@ Created on Mon Dec 20 09:38:41 2021
 
 @author: daniele.proverbio
 
-Code to monitor the COVID-19 epiddemic in Luxembourg and estimate useful
+Code to monitor the COVID-19 epidemic in Luxembourg and estimate useful
 indicators for the Ministry of Health and the Taskforce WP6.
 
 Path to input file at line 186
