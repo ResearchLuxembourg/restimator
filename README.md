@@ -48,7 +48,7 @@ R_t is estimated by running a Kalmar filter estimator with a nonlinear SIR-based
 ## Potential sources of code errors
 
 - Missing daily data: the program needs a data entry for each day.
-- Typos in the input file (in particular, relate to the input columns labels).
+- Typos in the input file (in particular, related to the input columns labels).
 - Flipped data reporting order: make sure that line 1 contains the most recent data value, line 2 the one from yesterday, and so on until the farthest one. The order should not be inverted.
 - Retrospectively changed data. To provide consistent results, the program needs initial conditions: the data history should not be altered.
 
