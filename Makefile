@@ -3,8 +3,8 @@ logFileDir := logs
 resultDir := output
 
 # tag of docker image
-tag_reff := covid19-reff
-tag_rt := covid19-rt
+tag_reff := covid-19_reproductionnumber_reff
+tag_rt := covid-19_reproductionnumber_rt
 
 # commands
 cmd_reff := python src/reff_estimator.py
