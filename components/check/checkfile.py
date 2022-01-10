@@ -5,13 +5,12 @@
 # -----
 
 import pandas as pd
-import numpy as np
 import os.path
 from datetime import date
 
 def checkfile(inputfile, idx_start):
     
-     check = True
+    check = True
     
     # check that file exists
     if not os.path.isfile(inputfile):
@@ -41,10 +40,14 @@ def checkfile(inputfile, idx_start):
         check = False
         raise ValueError('Error: Expected column "new_cases_resident" not found') 
     
-    # check that new cases are actually positive
-    if full_data['new_cases'].iloc[idx_start:].any() < 0 or full_data['new_cases_resident'].iloc[idx_start:].any() < 0:
+    # check that new cases are actually positive numbers
+    if full_data['new_cases'].iloc[idx_start:].all().isnumeric() and full_data['new_cases_resident'].iloc[idx_start:].all().isnumeric():
+        if full_data['new_cases'].iloc[idx_start:].any() < 0 or full_data['new_cases_resident'].iloc[idx_start:].any() < 0:
+            check = False
+            raise ValueError('Warning: invalid data entry detected (negative number)') 
+    else:
         check = False
-        raise ValueError('Warning: invalid data entry detected') 
+        raise ValueError('Error: invali data entry detected (not a number)') 
         
     # check consistency of reported numbers
     for daily_data in range(len(full_data["new_cases"])):
