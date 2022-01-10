@@ -39,7 +39,7 @@ R_eff is estimated from the data following a Bayesian inference algorithm. In a 
 
 The algorithm returns a most likely value and its associated 50% credible interval (where there is the highest confidence that the true value might lie).
 
-The present implementation builds upon a former implementation from the [rtcoviddlive project](https://github.com/rtcovidlive/).
+The present implementation builds upon a former implementation from the [rtcovidlive project](https://github.com/rtcovidlive/).
 
 ### R_t
 
