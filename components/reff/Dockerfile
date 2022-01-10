@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.9
-ARG DEFAULT_REG=""
+ARG DEFAULT_REG="docker-registry.lcsb.uni.lu/library"
 
 FROM ${DEFAULT_REG}/python:${PYTHON_VERSION}-slim
 
@@ -12,7 +12,7 @@ ADD setup.py /covid19-reproductionNumber
 RUN pip install -e .
 
 # add source files
-ADD src/* /covid19-reproductionNumber/src
+ADD src/* /covid19-reproductionNumber/src/
 
 # execute the pipeline
 CMD ["python"]
