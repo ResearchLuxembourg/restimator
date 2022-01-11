@@ -15,10 +15,10 @@ datestamp := $(date +%FT%T%z)
 # name of log file
 logFile :='logs/launch.log'
 
+# directory definitions
 current_dir = $(shell pwd)
-
-# name of mounted directory in Dockerfile
-mountDir := 'covid19-reproductionNumber'
+mount_dir := covid19-reproductionNumber
+matlab_home := /home/matlab
 
 # definitions
 .PHONY: default run build
@@ -42,12 +42,12 @@ build_rt:
 
 reff:
 	@echo " [$$(date +%FT%T%z)] + Starting Reff estimation ..." >> ${logFile}
-	@docker run -v $(current_dir)/output:/${mountDir}/output -v $(current_dir)/input:/${mountDir}/input ${tag_reff} ${cmd_reff} >> ${logFile}
+	@docker run -v $(current_dir)/output:/${mount_dir}/output -v $(current_dir)/input:/${mount_dir}/input ${tag_reff} ${cmd_reff} >> ${logFile}
 	@echo " [$$(date +%FT%T%z)] + Reff estimation done." >> ${logFile}
 
 rt:
 	@echo " [$$(date +%FT%T%z)] + Starting Rt estimation ..." >> ${logFile}
-	@docker run -it -v $(current_dir)/output:/home/matlab/covid19-reproductionNumber/output -v $(current_dir)/input:/home/matlab/covid19-reproductionNumber/input -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M ${tag_rt} ${cmd_rt} >> ${logFile}
+	@docker run -it -v $(current_dir)/output:${matlab_home}/${mount_dir}/output -v $(current_dir)/input:${matlab_home}/${mount_dir}/input -v ${MATLAB_LICENSE}:/license.dat --rm -e MLM_LICENSE_FILE=/license.dat --shm-size=512M ${tag_rt} ${cmd_rt} >> ${logFile}
 	@echo " [$$(date +%FT%T%z)] + Rt estimation done." >> ${logFile}
 
 clean:
