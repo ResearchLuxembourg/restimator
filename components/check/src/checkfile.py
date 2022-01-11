@@ -42,14 +42,15 @@ def checkfile(inputfile):
         check = False
         raise ValueError('Error: Expected column "new_cases_resident" not found') 
     
-    # check that new cases are actually positive numbers
-    if np.isscalar(full_data['new_cases'].all()) and np.isscalar(full_data['new_cases_resident'].all()):
-        if full_data['new_cases'].any() < 0 or full_data['new_cases_resident'].any() < 0:
+    # check that new cases are actually positive integer numbers
+    for i in range(len(full_data["new_cases"])):
+        if type(full_data['new_cases'].iloc[i]) != str and type(full_data['new_cases_resident'].iloc[i]) != str:
+            if full_data['new_cases'].iloc[i] < 0 or full_data['new_cases_resident'].iloc[i] < 0:
+                check = False
+                raise ValueError('Warning: invalid data entry detected (negative number) at line '+str(len(full_data["new_cases"])- i)) 
+        else:
             check = False
-            raise ValueError('Warning: invalid data entry detected (negative number)') 
-    else:
-        check = False
-        raise ValueError('Error: invali data entry detected (not a number)') 
+            raise ValueError('Error: invalid data entry detected (not a number) at line ' + str(len(full_data["new_cases"])- i)) 
         
     # check consistency of reported numbers
     for daily_data in range(len(full_data["new_cases"])):
@@ -61,6 +62,15 @@ def checkfile(inputfile):
     expected_latest_date_reporting = datetime.now() - DT.timedelta(days=1)
     if not full_data['report_date'].iloc[-1].strftime('%Y%m%d') == expected_latest_date_reporting.strftime('%Y%m%d'):
         raise ValueError('Warning: missing data point of today')
+
+    # check that past data are present, from 2020-02-28
+    expected_first_date_reporting = '20200228'
+    start = 0
+    for i in range(len(full_data["new_cases"])):
+        if full_data['report_date'].iloc[i].strftime('%Y%m%d') == expected_first_date_reporting:
+            start = 1
+    if start == 0:
+        raise ValueError('Warning: data series not complete from beginning (2022-02-28)')
 
     # rename file 
     old_name = inputfile

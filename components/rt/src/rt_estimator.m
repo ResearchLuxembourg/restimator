@@ -1,35 +1,35 @@
 %% Atte Aalto
-
-% change to the root of the file
-pathToFile = fileparts(mfilename('fullpath'));
-if ~isempty(pathToFile)
-    rootFolder = [pathToFile filesep '..'];
-else
-    rootFolder = pwd();
-end
-
-cd(rootFolder);
-addpath(genpath(rootFolder));
-
-% define output folder
-outFolder = [rootFolder filesep 'output'];
-checkFolder(outFolder);
-inFolder = [rootFolder filesep 'input'];
-checkFolder(inFolder);
+% 
+% % change to the root of the file
+% pathToFile = "input/"
+% if ~isempty(pathToFile)
+%     rootFolder = [pathToFile filesep '..'];
+% else
+%     rootFolder = pwd();
+% end
+% 
+% cd(rootFolder);
+% addpath(genpath(rootFolder));
+% 
+% % define output folder
+% outFolder = [rootFolder filesep 'output'];
+% checkFolder(outFolder);
+% inFolder = [rootFolder filesep 'input'];
+% checkFolder(inFolder);
 
 %Read input data
 today = datestr(clock, 29);
-inFile = [inFolder filesep today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx'];
-if isfile(inFile)
+inFile = "input/input-data"; %[inFolder filesep today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx'];
+if isfile(inFile)  % I keep this check in case anything appened
     TTin = readtable(inFile);
 else
     error(['The input file ' inFile ' cannot be found.']);
 end
 
 day0 = find(datetime(2020,2,28) == TTin.report_date);
-if isempty(day0)
-    error('Insufficient input file: Data from the start date, 28 February 2020, not found.');
-end
+% if isempty(day0)
+%     error('Insufficient input file: Data from the start date, 28 February 2020, not found.');
+% end
 Y = flipud(TTin.new_cases_resident(1:day0))';
 
 %Fixing some data anomalies (ad hoc)
@@ -205,7 +205,7 @@ for jday=1:Tlim
 
 end
 
-disp(' > Simulation done.')
+%disp(' > Simulation done.')
 
 % Create the output csv-file
 [dates, longdates, day, month, firsts, labs] = createDates;
@@ -214,6 +214,6 @@ TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
 Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
-writetable(TTout,[outFolder filesep filename])
+writetable(TTout,["output/" filename])
 
-disp([' > Outputfile written to ' outFolder])
+%disp([' > Outputfile written to ' outFolder])
