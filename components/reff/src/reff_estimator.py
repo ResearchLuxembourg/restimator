@@ -127,7 +127,7 @@ def get_posteriors(sr, date, sigma=0.15):
 
 while True:
     try:
-        path = "input/"+today+"_clinical_monitoring_cleaned_case_and_hospital_data.xlsx" #  specify path to file
+        path = "input/input-data.xlsx" #  specify path to file
         full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
         break
     except ValueError:

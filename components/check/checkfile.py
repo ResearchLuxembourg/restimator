@@ -6,9 +6,11 @@
 
 import pandas as pd
 import os.path
-from datetime import date
+import datetime as DT
+from datetime import datetime
+import numpy as np
 
-def checkfile(inputfile, idx_start):
+def checkfile(inputfile):
     
     check = True
     
@@ -23,8 +25,8 @@ def checkfile(inputfile, idx_start):
         raise ValueError('Error: incorrect input file format. Expected Excel .xlsx, received other')
         
     # check that the name is correct
-    expected_name = 'clinical_monitoring_'+str(date.today())+'_cleaned_case_and_hospital_data'
-    if os.path.splitext(os.path.basename(inputfile))[0] != expected_name:
+    expected_name = 'clinical_monitoring_'+str(datetime.today().strftime('%Y%m%d') )+'_cleaned_case_and_hospital_data'
+    if not os.path.splitext(os.path.basename(inputfile))[0] == expected_name:
         check = False
         raise ValueError('Error: file name incorrect. Expected "clinical_monitoring_DATEOFTODAY_cleaned_case_and_hospital_data.xlsx"') 
         
@@ -41,8 +43,8 @@ def checkfile(inputfile, idx_start):
         raise ValueError('Error: Expected column "new_cases_resident" not found') 
     
     # check that new cases are actually positive numbers
-    if full_data['new_cases'].iloc[idx_start:].all().isnumeric() and full_data['new_cases_resident'].iloc[idx_start:].all().isnumeric():
-        if full_data['new_cases'].iloc[idx_start:].any() < 0 or full_data['new_cases_resident'].iloc[idx_start:].any() < 0:
+    if np.isscalar(full_data['new_cases'].all()) and np.isscalar(full_data['new_cases_resident'].all()):
+        if full_data['new_cases'].any() < 0 or full_data['new_cases_resident'].any() < 0:
             check = False
             raise ValueError('Warning: invalid data entry detected (negative number)') 
     else:
@@ -53,7 +55,12 @@ def checkfile(inputfile, idx_start):
     for daily_data in range(len(full_data["new_cases"])):
         if full_data['new_cases'].iloc[daily_data] < full_data['new_cases_resident'].iloc[daily_data]:
             check = False
-            raise ValueError('Warning: total cases less than resident cases: are there missing data?') 
+            raise ValueError('Warning: total cases less than resident cases: are there missing data?')
+        
+    # check that the last datapoint is present
+    expected_latest_date_reporting = datetime.now() - DT.timedelta(days=1)
+    if not full_data['report_date'].iloc[-1].strftime('%Y%m%d') == expected_latest_date_reporting.strftime('%Y%m%d'):
+        raise ValueError('Warning: missing data point of today')
 
     # rename file 
     old_name = inputfile
