@@ -1,4 +1,4 @@
-ARG DEFAULT_REG="docker-registry.lcsb.uni.lu"
+ARG DEFAULT_REG=docker.io
 
 # build from the MATLAB base image
 FROM ${DEFAULT_REG}/mathworks/matlab:r2021b

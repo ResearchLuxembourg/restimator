@@ -1,7 +1,7 @@
 ARG PYTHON_VERSION=3.9
-ARG DEFAULT_REG="docker-registry.lcsb.uni.lu/library"
+ARG DEFAULT_REG=docker.io
 
-FROM ${DEFAULT_REG}/python:${PYTHON_VERSION}-slim
+FROM ${DEFAULT_REG}/library/python:${PYTHON_VERSION}-slim
 
 # create the working directory
 RUN mkdir -p /covid19-reproductionNumber/src
