@@ -1,7 +1,7 @@
 %% Atte Aalto
 % 
 % change to the root of the file
-pathToFile = "input/";
+pathToFile = fileparts(mfilename('fullpath'));
 if ~isempty(pathToFile)
     rootFolder = [pathToFile filesep '..'];
 else
@@ -211,6 +211,6 @@ TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
 Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
-writetable(TTout,["output" filesep filename])
+writetable(TTout,[outFolder filesep filename])
 
 disp([' > Outputfile written to ' outFolder])
