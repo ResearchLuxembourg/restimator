@@ -21,6 +21,7 @@ services:
     volumes:
       - ./input:/covid19-reproductionNumber/input/
       - ./output:/covid19-reproductionNumber/output/
+    command: python src/reff_estimator.py
     networks:
       - covid-net
 
@@ -31,13 +32,12 @@ services:
       dockerfile: ./Dockerfile
     container_name: rt
     volumes:
-      - ./input:/home/matlab/covid19-reproductionNumber/input/
-      - ./output:/home/matlab/covid19-reproductionNumber/output/
-      - ./components/rt/src:/home/matlab/covid19-reproductionNumber/src/
-      - ~/license-matlab.lic:/license.dat
+      - ./input/:/home/matlab/covid19-reproductionNumber/input/
+      - ./output/:/home/matlab/covid19-reproductionNumber/output/
+      - ${MATLAB_LICENSE}:/license.dat
     working_dir: /home/matlab/covid19-reproductionNumber
     environment:
       - MLM_LICENSE_FILE=/license.dat
-    command: matlab -r "run('src/rt_estimator.m');"
+    command: matlab -r "run('src/rt_estimator.m'); exit();"
     networks:
       - covid-net

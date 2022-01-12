@@ -54,24 +54,59 @@ R_t is estimated by running a Kalmar filter estimator with a nonlinear SIR-based
 
 [add additional info depending on the FAQ collected during daily practice]
 
+
 ## How to run the pipeline
 
-The pipeline can be run using any of the following `make` commands:
 
-| Command       | Purpose                                               |
-|---------------|-------------------------------------------------------|
-| make build    | build the pipeline                                    |
-| make run      | run the pipeline                                      |
-| make reff     | run the partial pipeline to generate `R_eff` (Python) |
-| make rt       | run the partial pipeline to generate `R_t` (Matlab)   |
-| make clean    | clean generated assets                                |
-| make all      | clean first, then build and run the full pipeline     |
+### MATLAB license
 
-Alternatively, if [Docker Compose](https://docs.docker.com/compose/) is available, you can run the pipeline using:
+The license for MATLAB must be downloaded from [Mathworks](https://mathworks.com) after activation of the hostid of the container.
+
+The hostid is displayed after running the pipeline for the first time (see instructions below).
+
+Once the license (`license.lic`) is available locally, the following environment variable as to be set:
+
+```bash
+export MATLAB_LICENSE=<location of license file>
+```
+
+Then, the pipeline can be run. Please note that each time the container is built, the hostid changes, and so is the license.
+Also, the hostid may differ between different builts of the container.
+
+### Docker Compose (preferred)
+
+If [Docker Compose](https://docs.docker.com/compose/) is available, you can run the `rt` pipeline using:
+
+```bash
+docker compose run rt
+```
+
+Similarly, you can run the `reff` pipeline using:
+
+```bash
+docker compose run reff
+```
+
+The full pipeline can be run using:
 
 ```bash
 docker compose up
 ```
+
+### Makefile
+
+The pipeline can be run using any of the following `make` commands:
+
+| Command         | Purpose                                               |
+|-----------------|-------------------------------------------------------|
+| make all        | clean first, then build and run the full pipeline     |
+| make build      | build the pipeline                                    |
+| make build_reff | build the `R_eff` pipeline                            |
+| make build_rt   | build the `R_t` pipeline                              |
+| make run        | run the pipeline                                      |
+| make reff       | run the partial pipeline to generate `R_eff` (Python) |
+| make rt         | run the partial pipeline to generate `R_t` (Matlab)   |
+| make clean      | clean generated assets                                |
 
 ## Credits and contacts
 
