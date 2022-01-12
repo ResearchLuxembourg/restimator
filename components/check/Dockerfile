@@ -7,7 +7,7 @@ FROM ${DEFAULT_REG}/library/python:${PYTHON_VERSION}-slim
 ENV WORKING_DIR=/covid19-reproductionNumber
 
 # create the working directory
-RUN mkdir -p ${WORKING_DIR}/src
+RUN mkdir -p ${WORKING_DIR}/src ${WORKING_DIR}/input
 WORKDIR ${WORKING_DIR}/
 
 # add setup and install
