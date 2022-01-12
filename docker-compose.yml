@@ -12,6 +12,18 @@ networks:
     name: covid-net
 
 services:
+  check:
+    logging: *default-logging
+    build:
+      context: ./components/check/
+      dockerfile: ./Dockerfile
+    container_name: check
+    volumes:
+      - ./input:/covid19-reproductionNumber/input/
+    command: python src/checkfile.py
+    networks:
+      - covid-net
+
   reff:
     logging: *default-logging
     build:

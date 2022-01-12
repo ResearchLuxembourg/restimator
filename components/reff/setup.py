@@ -6,7 +6,7 @@ setup(
     url='https://github.com/ResearchLuxembourg/covid-19_reproductionNumber',
     author='Research Luxembourg WP6',
     author_email='lcsb-r3@uni.lu',
-    description='Estimator for COVID-19 R(t)',
+    description='Estimator for COVID-19 Reff',
     install_requires=[
         'pandas>=1.3.5',
         'numpy>=1.22.0',
