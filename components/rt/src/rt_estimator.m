@@ -1,25 +1,25 @@
 %% Atte Aalto
 % 
-% % change to the root of the file
-% pathToFile = "input/"
-% if ~isempty(pathToFile)
-%     rootFolder = [pathToFile filesep '..'];
-% else
-%     rootFolder = pwd();
-% end
-% 
-% cd(rootFolder);
-% addpath(genpath(rootFolder));
-% 
-% % define output folder
-% outFolder = [rootFolder filesep 'output'];
-% checkFolder(outFolder);
-% inFolder = [rootFolder filesep 'input'];
-% checkFolder(inFolder);
+% change to the root of the file
+pathToFile = "input/"
+if ~isempty(pathToFile)
+    rootFolder = [pathToFile filesep '..'];
+else
+    rootFolder = pwd();
+end
+
+cd(rootFolder);
+addpath(genpath(rootFolder));
+
+% define output folder
+outFolder = [rootFolder filesep 'output'];
+checkFolder(outFolder);
+inFolder = [rootFolder filesep 'input'];
+checkFolder(inFolder);
 
 %Read input data
 today = datestr(clock, 29);
-inFile = "input/input-data"; %[inFolder filesep today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx'];
+inFile = [inFolder filesep 'input-data.xlsx'];
 if isfile(inFile)  % I keep this check in case anything appened
     TTin = readtable(inFile);
 else

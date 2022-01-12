@@ -39,8 +39,6 @@ idx_start = 22 # Initial condition, over the first wave in March
 # ----- some preparation to make sure data are ok
 def prepare_cases(cases, cutoff=25):   # prepare data, to get daily cases and smoothing
     new_cases = cases.diff()
-    if new_cases.any() < 0:            # raise exception: some day is skipped, or data are input incorrectly
-        raise ValueError('Problem with data: negative new cases encountered')
 
     smoothed = new_cases.rolling(7,
         min_periods=1,
@@ -125,28 +123,14 @@ def get_posteriors(sr, date, sigma=0.15):
 #
 # -----
 
-while True:
-    try:
-        path = "input/input-data.xlsx" #  specify path to file
-        full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
-        break
-    except ValueError:
-         print("File name not recognised")
+path = "input/input-data.xlsx" #  specify path to file
+full_data = pd.read_excel(path, engine='openpyxl').iloc[::-1].reset_index()
 
-while True:
-    try:
-        data_df = pd.DataFrame(full_data,
-                       columns =['report_date','new_cases','positive_patients_intensive_care','positive_patients_normal_care', 'covid_patients_dead', 'new_cases_resident','tests_done_resident'])
-        break
-    except ValueError:
-        print("Possible typo in columns names")
+data_df = pd.DataFrame(full_data, columns =['report_date','new_cases','positive_patients_intensive_care','positive_patients_normal_care', 'covid_patients_dead', 'new_cases_resident','tests_done_resident'])
 
 population_LU = 600000
 dates = data_df.iloc[idx_start:].index
 dates_detection = date2num(dates.tolist())
-if dates_detection[1]>dates_detection[2]:
-    raise ValueError('Warning: data are sorted incorrectly')  # In principle, this can be easily solved with a sort function; however, other people read those data in an agreed formmat an it's important to doublecheck
-
 
 # -----
 #
