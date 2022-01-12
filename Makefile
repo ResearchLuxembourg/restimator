@@ -3,10 +3,12 @@ logFileDir := logs
 resultDir := output
 
 # tag of docker image
+tag_check := covid-19_reproductionnumber_check
 tag_reff := covid-19_reproductionnumber_reff
 tag_rt := covid-19_reproductionnumber_rt
 
 # commands
+cmd_check := python src/checkfile.py
 cmd_reff := python src/reff_estimator.py
 cmd_rt := matlab -r "run('src/rt_estimator.m'); exit();"
 
@@ -25,11 +27,16 @@ matlab_home := /home/matlab
 
 all: clean build run
 
-build: build_reff build_rt
+build: build_check build_reff build_rt
 
-run: reff rt
+run: check reff rt
 
-# build the container for Reff
+# build the containers
+build_check:
+	@echo " [$$(date +%FT%T%z)] + Starting building container for check ..." >> ${logFile}
+	@cd components/check/ && docker build -t ${tag_check} .
+	@echo " [$$(date +%FT%T%z)] + Container for check generated." >> ${logFile}
+
 build_reff:
 	@echo " [$$(date +%FT%T%z)] + Starting building container for Reff ..." >> ${logFile}
 	@cd components/reff/ && docker build -t ${tag_reff} .
@@ -39,6 +46,11 @@ build_rt:
 	@echo " [$$(date +%FT%T%z)] + Starting building container for Rt ..." >> ${logFile}
 	@cd components/rt/ && docker build -t ${tag_rt} .
 	@echo " [$$(date +%FT%T%z)] + Container for Rt generated." >> ${logFile}
+
+check:
+	@echo " [$$(date +%FT%T%z)] + Starting check ..." >> ${logFile}
+	@docker run -v $(current_dir)/input:/${mountDir}/input ${tag_check} ${cmd_check} >> ${logFile}
+	@echo " [$$(date +%FT%T%z)] + Check done." >> ${logFile}
 
 reff:
 	@echo " [$$(date +%FT%T%z)] + Starting Reff estimation ..." >> ${logFile}

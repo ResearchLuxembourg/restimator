@@ -1,5 +1,5 @@
 %% Atte Aalto
-
+% 
 % change to the root of the file
 pathToFile = fileparts(mfilename('fullpath'));
 if ~isempty(pathToFile)
@@ -19,17 +19,14 @@ checkFolder(inFolder);
 
 %Read input data
 today = datestr(clock, 29);
-inFile = [inFolder filesep today '_clinical_monitoring_cleaned_case_and_hospital_data.xlsx'];
-if isfile(inFile)
+inFile = [inFolder filesep 'input-data.xlsx'];
+if isfile(inFile)  % I keep this check in case anything appened
     TTin = readtable(inFile);
 else
     error(['The input file ' inFile ' cannot be found.']);
 end
 
 day0 = find(datetime(2020,2,28) == TTin.report_date);
-if isempty(day0)
-    error('Insufficient input file: Data from the start date, 28 February 2020, not found.');
-end
 Y = flipud(TTin.new_cases_resident(1:day0))';
 
 %Fixing some data anomalies (ad hoc)
