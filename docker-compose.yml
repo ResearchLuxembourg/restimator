@@ -34,6 +34,8 @@ services:
       - ./input:/covid19-reproductionNumber/input/
       - ./output:/covid19-reproductionNumber/output/
     command: python src/reff_estimator.py
+    depends_on:
+      - check
     networks:
       - covid-net
 
@@ -51,5 +53,7 @@ services:
     environment:
       - MLM_LICENSE_FILE=/license.dat
     command: matlab -r "run('src/rt_estimator.m'); exit();"
+    depends_on:
+      - check
     networks:
       - covid-net
