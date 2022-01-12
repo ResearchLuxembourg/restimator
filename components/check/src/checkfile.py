@@ -8,7 +8,7 @@ import pandas as pd
 import os.path
 import datetime as DT
 from datetime import datetime
-import numpy as np
+import glob
 
 def checkfile(inputfile):
 
@@ -55,6 +55,23 @@ def checkfile(inputfile):
             start = 1
     if start == 0:
         raise ValueError('Error: data series not complete from beginning (2022-02-28)')
+
+input_dir = './input'
+xlsxFiles = glob.glob(input_dir+'/*.xlsx')
+
+if len(xlsxFiles) > 1:
+    raise ValueError('There are several input files.')
+else:
+    inputfile = xlsxFiles[0]
+    # alert that the date in the file name is not the one of today
+    expected_name = 'clinical_monitoring_'+str(datetime.today().strftime('%Y%m%d') )+'_cleaned_case_and_hospital_data'
+    if not os.path.splitext(os.path.basename(inputfile))[0] == expected_name:
+        raise Warning('The date in the uploaded file name is not correct and the name is not according to the agreed standard."')
+
+    # rename the input file
+    old_name = inputfile
+    new_name = 'input/input-data.xlsx'
+    os.rename(old_name, new_name)
 
 # call checkfile function
 checkfile("input/input-data.xlsx")
