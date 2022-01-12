@@ -27,9 +27,6 @@ else
 end
 
 day0 = find(datetime(2020,2,28) == TTin.report_date);
-% if isempty(day0)
-%     error('Insufficient input file: Data from the start date, 28 February 2020, not found.');
-% end
 Y = flipud(TTin.new_cases_resident(1:day0))';
 
 %Fixing some data anomalies (ad hoc)
@@ -214,6 +211,6 @@ TTout = array2table(M','VariableNames',{'Rt_estimate','Standard_deviation'});
 Tdate = cell2table(longdates(18+(1:size(M,2)))','VariableNames',{'Date'});
 TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
-writetable(TTout,["output/" filename])
+writetable(TTout,["output" filesep filename])
 
 %disp([' > Outputfile written to ' outFolder])
