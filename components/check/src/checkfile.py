@@ -66,13 +66,7 @@ def checkfile(inputfile):
     if start == 0:
         raise ValueError('Warning: data series not complete from beginning (2022-02-28)')
 
-    # rename file
-    old_name = inputfile
-    new_name = 'input/input-data.xlsx'
-    os.rename(old_name, new_name)
-
     return check
 
 # call checkfile function
-path = "input/input-data.xlsx"
-checkfile(path)
+checkfile("input/input-data.xlsx")
