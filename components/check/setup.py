@@ -9,8 +9,8 @@ setup(
     description='Check input file for reproduction number pipeline',
     install_requires=[
         'pandas>=1.3.5',
-        'numpy>=1.22.0',
         'datetime>=4.3',
+        'openpyxl>=3.0.9'
     ],
     packages=find_packages(),
 )
