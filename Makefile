@@ -49,7 +49,7 @@ build_rt:
 
 check:
 	@echo " [$$(date +%FT%T%z)] + Starting check ..." >> ${logFile}
-	@docker run -v $(current_dir)/input:/${mountDir}/input ${tag_check} ${cmd_check} >> ${logFile}
+	@docker run -v $(current_dir)/input:/${mount_dir}/input ${tag_check} ${cmd_check} >> ${logFile}
 	@echo " [$$(date +%FT%T%z)] + Check done." >> ${logFile}
 
 reff:
