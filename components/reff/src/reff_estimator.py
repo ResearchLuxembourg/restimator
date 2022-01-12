@@ -163,8 +163,10 @@ most_likely = posteriors.idxmax().rename('Reff-estimate')   # mean R_eff value
 
 result = pd.concat([most_likely, hdis], axis=1)
 result = result.set_index(data_df.report_date.iloc[idx_start:])
-result.to_csv('output/'+today+'_Reff-estimate.csv')   # decide on a name and specify path !!!
 
+print(' > Simulation done')
+result.to_csv('output/'+today+'_Reff-estimate.csv')   # decide on a name and specify path !!!
+print(' > Output file written in output folder')
 
 
 # -----
@@ -184,3 +186,4 @@ ax2.xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 
 fig.savefig("output/"+today+"_Reff_residents.pdf",bbox_inches = "tight",transparent=True) # decide name and specify path !!!
 
+print(' > Output image saved in output folder')

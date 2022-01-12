@@ -1,7 +1,7 @@
 %% Atte Aalto
 % 
 % change to the root of the file
-pathToFile = "input/"
+pathToFile = "input/";
 if ~isempty(pathToFile)
     rootFolder = [pathToFile filesep '..'];
 else
@@ -202,7 +202,7 @@ for jday=1:Tlim
 
 end
 
-%disp(' > Simulation done.')
+disp(' > Simulation done.')
 
 % Create the output csv-file
 [dates, longdates, day, month, firsts, labs] = createDates;
@@ -213,4 +213,4 @@ TTout = [Tdate,TTout];
 filename = [today '_Rt_estimate.csv'];
 writetable(TTout,["output" filesep filename])
 
-%disp([' > Outputfile written to ' outFolder])
+disp([' > Outputfile written to ' outFolder])
