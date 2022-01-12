@@ -57,7 +57,8 @@ def checkfile(inputfile):
         raise ValueError('Error: data series not complete from beginning (2022-02-28)')
 
 input_dir = './input'
-xlsxFiles = glob.glob(input_dir+'/*.xlsx')
+standard_name = input_dir + '/input-data.xlsx'
+xlsxFiles = glob.glob(input_dir + '/*.xlsx')
 
 if len(xlsxFiles) > 1:
     raise ValueError('There are several input files.')
@@ -66,12 +67,16 @@ else:
     # alert that the date in the file name is not the one of today
     expected_name = 'clinical_monitoring_'+str(datetime.today().strftime('%Y%m%d') )+'_cleaned_case_and_hospital_data'
     if not os.path.splitext(os.path.basename(inputfile))[0] == expected_name:
-        raise Warning('The date in the uploaded file name is not correct and the name is not according to the agreed standard."')
+        print("Warning: The date in the uploaded file name is not correct and the name is not according to the de facto standard.")
 
     # rename the input file
-    old_name = inputfile
-    new_name = 'input/input-data.xlsx'
-    os.rename(old_name, new_name)
+    if inputfile != standard_name:
+        old_name = inputfile
+        new_name = standard_name
+        os.rename(old_name, new_name)
+        print("Warning: Input file renamed (original file name: " + inputfile + ")")
+    else:
+        print("Warning: Input already with standard name.")
 
 # call checkfile function
 checkfile("input/input-data.xlsx")
