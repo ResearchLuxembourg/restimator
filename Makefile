@@ -3,7 +3,7 @@ logFileDir := logs
 resultDir := output
 
 # tag of docker image
-tag_check := check
+tag_check := covid19-check
 tag_reff := covid19-reff
 tag_rt := covid19-rt
 
