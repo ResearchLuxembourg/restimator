@@ -11,11 +11,8 @@ ENV LOCAL_USER_ID=1002
 ENV LOCAL_USER_GROUP=1003
 
 # create the working directory
-RUN mkdir -p ${WORKING_DIR}/
+RUN mkdir -p ${WORKING_DIR}/src ${WORKING_DIR}/input ${WORKING_DIR}/output
 WORKDIR ${WORKING_DIR}/
-
-# create required directories
-RUN mkdir src input output
 
 # add source files
 ADD src/* ${WORKING_DIR}/src/
