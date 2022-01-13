@@ -118,7 +118,7 @@ The pipeline can be run using any of the following `make` commands:
 - [Atte Aalto](https://github.com/AtteAalto): R_t code development
 - [Laurent Heirendt](https://github.com/laurentheirendt), [Jacek Leboida](https://github.com/jLebioda), [Christophe Trefois](https://github.com/trefex) and the LCSB R3 team: docker and website development and deployment
 
-   <img src="https://github.com/ResearchLuxembourg/covid-19_reproductionNumber/blob/daniele-proverbio-patch-1/logos/logos.png" alt="logos" width="350"/>  
+   <img src="docs/logos.png" alt="logos" width="350"/>  
 
 
 For basic troubleshooting of raised warnings and errors, check the readme section first.
