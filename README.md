@@ -114,12 +114,14 @@ The pipeline can be run using any of the following `make` commands:
 ## Credits and contacts
 
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
-- Daniele Proverbio: R_eff code development, website ideation and content creation
-- Atte Aalto: R_t code development
-- Laurent Heirendt, Jacek Leboida, Christophe Trefois and the LCSB R3 team: docker and website development and deployment
-- [UniLu/LCSB: website hosting and maintenance?]
+- [Daniele Proverbio](https://github.com/daniele-proverbio): R_eff code development, website ideation and content creation
+- [Atte Aalto](https://github.com/AtteAalto): R_t code development
+- [Laurent Heirendt](https://github.com/laurentheirendt), [Jacek Leboida](https://github.com/jLebioda), [Christophe Trefois](https://github.com/trefex) and the LCSB R3 team: docker and website development and deployment
 
-For raised warnings and errors, check the readme section first, for basic troubleshooting.
+   <img src="https://github.com/ResearchLuxembourg/covid-19_reproductionNumber/blob/daniele-proverbio-patch-1/logos/logos.png" alt="logos" width="350"/>  
+
+
+For basic troubleshooting of raised warnings and errors, check the readme section first.
 If the problem persist, please contact the developers.
 
 > Copyright 2020-2022 Luxembourg Centre for Systems Biomedicine
@@ -135,4 +137,3 @@ If the problem persist, please contact the developers.
 > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 > See the License for the specific language governing permissions and
 > limitations under the License.
-
