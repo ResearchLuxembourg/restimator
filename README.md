@@ -46,13 +46,16 @@ The present implementation builds upon a former implementation from the [rtcovid
 R_t is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
 
 ## Potential sources of code errors
+The pipeline might raise errors in case the initial check on data quality is not satisfied. For basic troubleshooting, refer to this section.
 
-- Missing daily data: the program needs a data entry for each day.
-- Typos in the input file (in particular, related to the input columns labels).
-- Flipped data reporting order: make sure that line 1 contains the most recent data value, line 2 the one from yesterday, and so on until the farthest one. The order should not be inverted.
-- Retrospectively changed data. To provide consistent results, the program needs initial conditions: the data history should not be altered.
-
-[add additional info depending on the FAQ collected during daily practice]
+- File does not exist: error in loading the input file.
+- Incorrect file format: expected format is Excel .xlsx.
+- Incorrect file name: the _de facto_ agreed file naming is "clinical_monitoring_'+DATEOFTODAY[yyyymmdd]+_cleaned_case_and_hospital_data".
+- Missing daily data: the program needs a data entry for each day, as a positive integer.
+- Typos in the input file (in particular, related to the input columns labels) or missing input column: expected input columns are "report date", "new_cases", "new_cases_resident".
+- Inconsistency: daily cases for residents should be less or equal to total new daily cases.
+- Retrospectively changed data. To provide consistent results, the program needs initial conditions: the data history should not be altered, starting from 2020-02-28.
+- Last datapoint missing (relative to the latest detection date of 'yesterday').
 
 
 ## How to run the pipeline
@@ -112,8 +115,8 @@ The pipeline can be run using any of the following `make` commands:
 
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
 - Daniele Proverbio: R_eff code development, website ideation and content creation
-- [Atte if we include his code]
-- [credits to R3 team for website development and deployment]
+- Atte Aalto: R_t code development
+- Laurent Heirendt, Jacek Leboida, Christophe Trefois and the LCSB R3 team: docker and website development and deployment
 - [UniLu/LCSB: website hosting and maintenance?]
 
 For raised warnings and errors, check the readme section first, for basic troubleshooting.
