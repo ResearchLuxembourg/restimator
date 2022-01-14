@@ -118,7 +118,7 @@ The pipeline can be run using any of the following `make` commands:
 - [Atte Aalto](https://github.com/AtteAalto): R_t code development
 - [Laurent Heirendt](https://github.com/laurentheirendt), [Jacek Leboida](https://github.com/jLebioda), [Christophe Trefois](https://github.com/trefex) and the LCSB R3 team: docker and website development and deployment
 
-   <img src="docs/uni.png" alt="logos" height="100"/>     <img src="docs/lcsb.png" alt="logos" height="100"/>  <img src="docs/res_lux.png" alt="logos" height="100"/>  
+   <img src="docs/unilu.svg" alt="logos" height="100"/>  &nbsp; &nbsp;    <img src="docs/lcsb.svg" alt="logos" height="100"/> &nbsp; &nbsp; <img src="docs/res_lux.png" alt="logos" height="100"/>  
 
 
 For basic troubleshooting of raised warnings and errors, check the readme section first.
