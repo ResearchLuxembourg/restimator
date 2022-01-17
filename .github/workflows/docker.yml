@@ -7,13 +7,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-  steps:
-    - name: Check Out Repo
-      uses: actions/checkout@v2
-    - name: Build and push
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        context: ./components/reff
-        file: ./Dockerfile
-        push: false
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./components/reff
+          file: ./Dockerfile
+          push: false
