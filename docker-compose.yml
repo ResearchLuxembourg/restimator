@@ -50,6 +50,8 @@ services:
       - ./output/:/home/matlab/covid19-reproductionNumber/output/
       - ${MATLAB_LICENSE}:/license.dat
     working_dir: /home/matlab/covid19-reproductionNumber
+    # Warning - `mac_address` to be tested (legacy)
+    mac_address: 02:42:ac:12:00:04
     environment:
       - MLM_LICENSE_FILE=/license.dat
     command: matlab -r "run('src/rt_estimator.m'); exit();"
