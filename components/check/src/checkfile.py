@@ -4,24 +4,43 @@
 #
 # -----
 
-import pandas as pd
-import os.path
-import datetime as DT
-from datetime import datetime
+import datetime
 import glob
+import os.path
 
-def checkfile(inputfile):
+import pandas as pd
 
-    # check that file exists
-    if not os.path.isfile(inputfile):
-        raise ValueError('Error: file does not exist')
 
-    # check it's and Excel file
-    if os.path.splitext(inputfile)[1] != ".xlsx":
-        raise ValueError('Error: incorrect input file format. Expected Excel .xlsx, received other')
+EXPECTED_FIRST_DATE_REPORTING = '20200228'
+INPUT_DIR = './input'
 
-    # check that the necessary columns are present
-    full_data = pd.read_excel(inputfile).iloc[::-1].reset_index()
+
+# Utils ------------------------------------------------------------------------
+
+def load_excel_to_data_frame(path: str) -> pd.DataFrame:
+    return pd.read_excel(path).iloc[::-1].reset_index()
+
+def rename_file_to_standard_name(path_old: str, path_new: str) -> None:
+    if path_old != path_new:
+        old_name = path_old
+        new_name = path_new
+        os.rename(old_name, new_name)
+        print(f"Warning: Input file renamed (original file name: {input_file} to: {new_name})")
+    else:
+        print("OK: Input already with standard name.")
+
+# Checks -----------------------------------------------------------------------
+
+def check_if_file_exists(path: str) -> None:
+    if not os.path.isfile(path):
+        raise ValueError(f'Error: file does not exist at "{path}"')
+
+def check_if_file_is_excel(path: str) -> None:
+    extension = os.path.splitext(path)[1]
+    if extension != ".xlsx":
+        raise ValueError(f'Error: incorrect input file format. Expected Excel .xlsx, received other ({extension})')
+
+def check_if_columns_are_present(full_data: pd.DataFrame) -> None:
     if 'report_date' not in full_data.columns:
         raise ValueError('Error: Expected column "report_date" not found')
     if 'new_cases' not in full_data.columns:
@@ -29,7 +48,7 @@ def checkfile(inputfile):
     if 'new_cases_resident' not in full_data.columns:
         raise ValueError('Error: Expected column "new_cases_resident" not found')
 
-    # check that new cases are actually positive integer numbers
+def check_new_cases(full_data: pd.DataFrame) -> None:
     for i in range(len(full_data["new_cases"])):
         if type(full_data['new_cases'].iloc[i]) != str and type(full_data['new_cases_resident'].iloc[i]) != str:
             if full_data['new_cases'].iloc[i] < 0 or full_data['new_cases_resident'].iloc[i] < 0:
@@ -37,46 +56,58 @@ def checkfile(inputfile):
         else:
             raise ValueError('Error: invalid data entry detected (not a number) at line ' + str(len(full_data["new_cases"])- i))
 
-    # check consistency of reported numbers
+def check_consistency_of_reported_numbers(full_data: pd.DataFrame) -> None:
     for daily_data in range(len(full_data["new_cases"])):
         if full_data['new_cases'].iloc[daily_data] < full_data['new_cases_resident'].iloc[daily_data]:
             raise ValueError('Error: total cases less than resident cases: are there missing data?')
 
-    # check that the last datapoint is present
-    expected_latest_date_reporting = datetime.now() - DT.timedelta(days=1)
-    if not full_data['report_date'].iloc[-1].strftime('%Y%m%d') == expected_latest_date_reporting.strftime('%Y%m%d'):
-        raise ValueError('Error: missing data point of today')
+def check_presence_of_last_datapoint(full_data: pd.DataFrame) -> None:
+    expected_latest_date_reporting = datetime.datetime.now() - datetime.timedelta(days=1)
+    reported_date = full_data['report_date'].iloc[-1].strftime('%Y%m%d')
+    expected_date = expected_latest_date_reporting.strftime('%Y%m%d')
+    if not reported_date == expected_date:
+        raise ValueError(f'Error: missing data point of today (expected {expected_date}, was: {reported_date})')
 
-    # check that past data are present, from 2020-02-28
-    expected_first_date_reporting = '20200228'
+def check_presence_of_past_data(full_data: pd.DataFrame) -> None:
     start = 0
     for i in range(len(full_data["new_cases"])):
-        if full_data['report_date'].iloc[i].strftime('%Y%m%d') == expected_first_date_reporting:
+        if full_data['report_date'].iloc[i].strftime('%Y%m%d') == EXPECTED_FIRST_DATE_REPORTING:
             start = 1
     if start == 0:
-        raise ValueError('Error: data series not complete from beginning (2022-02-28)')
+        the_date = EXPECTED_FIRST_DATE_REPORTING[:4] + "-" + EXPECTED_FIRST_DATE_REPORTING[4:6] + "-" + EXPECTED_FIRST_DATE_REPORTING[6:8]
+        raise ValueError(f'Error: data series not complete from beginning ({the_date})')
 
-input_dir = './input'
-standard_name = input_dir + '/input-data.xlsx'
-xlsxFiles = glob.glob(input_dir + '/*.xlsx')
+def check_filename(path: str) -> None:
+    # Alert that the date in the file name is not the one of today
+    today = datetime.datetime.today().strftime('%Y%m%d')
+    expected_name = f'clinical_monitoring_{today}_cleaned_case_and_hospital_data'
+    factual_name = os.path.splitext(os.path.basename(input_file))[0]
+    if not factual_name == expected_name:
+        print(f"Warning: The date in the uploaded file name is not correct and the name is not according to the de facto standard (is '{factual_name}', should be '{expected_name}').")
 
-if len(xlsxFiles) > 1:
-    raise ValueError('There are several input files.')
-else:
-    inputfile = xlsxFiles[0]
-    # alert that the date in the file name is not the one of today
-    expected_name = 'clinical_monitoring_'+str(datetime.today().strftime('%Y%m%d') )+'_cleaned_case_and_hospital_data'
-    if not os.path.splitext(os.path.basename(inputfile))[0] == expected_name:
-        print("Warning: The date in the uploaded file name is not correct and the name is not according to the de facto standard.")
+# All checks ---------------------------------------------------------------------
 
-    # rename the input file
-    if inputfile != standard_name:
-        old_name = inputfile
-        new_name = standard_name
-        os.rename(old_name, new_name)
-        print("Warning: Input file renamed (original file name: " + inputfile + ")")
+def run_all_checks_over_the_file(input_file):
+    check_if_file_exists(input_file)
+    check_if_file_is_excel(input_file)
+
+    full_data = load_excel_to_data_frame(input_file)
+    check_if_columns_are_present(full_data)
+    check_new_cases(full_data)
+    check_consistency_of_reported_numbers(full_data)
+    check_presence_of_last_datapoint(full_data)
+    check_presence_of_past_data(full_data)
+
+
+if __name__ == "__main__":
+    standard_name = INPUT_DIR + '/input-data.xlsx'
+    xlsxFiles = glob.glob(INPUT_DIR + '/*.xlsx')
+
+    if len(xlsxFiles) > 1:
+        raise ValueError('There are several input files.')
     else:
-        print("Warning: Input already with standard name.")
-
-# call checkfile function
-checkfile("input/input-data.xlsx")
+        input_file = xlsxFiles[0]
+    
+    check_filename(input_file)
+    rename_file_to_standard_name(input_file, standard_name)
+    run_all_checks_over_the_file("input/input-data.xlsx")
