@@ -66,8 +66,9 @@ else:
     inputfile = xlsxFiles[0]
     # alert that the date in the file name is not the one of today
     expected_name = 'clinical_monitoring_'+str(datetime.today().strftime('%Y%m%d') )+'_cleaned_case_and_hospital_data'
-    if not os.path.splitext(os.path.basename(inputfile))[0] == expected_name:
-        print("Warning: The date in the uploaded file name is not correct and the name is not according to the de facto standard.")
+    factual_name = os.path.splitext(os.path.basename(inputfile))[0]
+    if not factual_name == expected_name:
+        print(f"Warning: The date in the uploaded file name ({factual_name}) is not correct and the name is not according to the de facto standard ({expected_name}).")
 
     # rename the input file
     if inputfile != standard_name:
