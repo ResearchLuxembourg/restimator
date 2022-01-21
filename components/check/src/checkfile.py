@@ -44,8 +44,10 @@ def checkfile(inputfile):
 
     # check that the last datapoint is present
     expected_latest_date_reporting = datetime.now() - DT.timedelta(days=1)
-    if not full_data['report_date'].iloc[-1].strftime('%Y%m%d') == expected_latest_date_reporting.strftime('%Y%m%d'):
-        raise ValueError('Error: missing data point of today')
+    reported_date = full_data['report_date'].iloc[-1].strftime('%Y%m%d')
+    expected_date = expected_latest_date_reporting.strftime('%Y%m%d')
+    if not reported_date == expected_date:
+        raise ValueError(f'Error: missing data point of today (expected {expected_date}, was: {reported_date}')
 
     # check that past data are present, from 2020-02-28
     expected_first_date_reporting = '20200228'
