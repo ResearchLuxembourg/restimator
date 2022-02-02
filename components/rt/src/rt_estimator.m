@@ -58,7 +58,7 @@ wed = 1.25;
 
 %Ratio total / detected
 darkNumber_1 = 3;    %Until May 2020
-darkNumber_2 = 1.8;  %June 2020 onwards
+darkNumber_2 = 1.5;  %June 2020 onwards
 
 % Output coefficient (weekday-dependent)
 C = ones(1,length(Y)+2); %Tuesday - Saturday
