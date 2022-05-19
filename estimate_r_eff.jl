@@ -3,7 +3,8 @@ include("lib/common.jl")
 
 @assert (length(ARGS)==1) "expects a single filename argument"
 
-df = read_one_sheet_xlsx(ARGS[1])
+filename = ARGS[1]
+df = read_one_sheet_xlsx(filename)
 
 start_date = Date("2020-02-24")
 discard_dates = 22
@@ -31,7 +32,7 @@ rt_max = 10
 rt_samples = rt_max*100+1
 rt_range = LinRange(0, rt_max, rt_samples)
 
-import Random, Distributions
+using Random, Distributions
 Random.seed!(12345)
 gamma = 1 ./ (4 .+ 0.2 .* randn(rt_samples))
 lam = exp.(gamma .* (rt_range .- 1)) * cases_smoothed[begin:end-1]'
@@ -52,7 +53,7 @@ log_likelihood = 0.0
     numerator = likelihoods[:,previous_day] .* current_prior
     denominator = sum(numerator)
     posteriors[:,current_day] .= numerator./denominator
-    log_likelihood += log(denominator)
+    global log_likelihood += log(denominator)
 end
 
 shortest_partial_sum_range(series, s) = let sums=cumsum(series)
@@ -66,4 +67,12 @@ maxima = findmax.(eachcol(posteriors))
 results = rt_max .* [map(last, maxima) map(first, ranges) map(last,ranges)] ./ rt_samples
 dates = (start_date + Day(discard_dates)) .+ Day.(eachindex(ranges))
 
-CSV.write(stdout, DataFrame(date=dates, Reff_estimate=results[:,1], Reff_50_lo=results[:,2], Reff_50_hi=results[:,3]))
+CSV.write(
+    joinpath(dirname(filename), "Reff_estimate_$(basename(filename)).csv"),
+    DataFrame(
+        date=dates,
+        Reff_estimate=results[:,1],
+        Reff_50_lo=results[:,2],
+        Reff_50_hi=results[:,3],
+    ),
+)

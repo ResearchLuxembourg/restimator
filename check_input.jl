@@ -19,7 +19,7 @@ end
 # check if new cases are okay
 for col in [:new_cases, :new_cases_resident]
     @assert all(typeof.(df[:,col]) .== Int64) "Data in $col must be integer numbers"
-    @assert (df[,col] .>= 0) "New cases in $col must not be negative"
+    @assert all(df[:,col] .>= 0) "New cases in $col must not be negative"
 end
 
 @assert all(df.new_cases .>= df.new_cases_resident) "Total cases should be greater than resident cases (data are missing?)"

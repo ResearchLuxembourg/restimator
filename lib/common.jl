@@ -1,5 +1,5 @@
 
-using XLSX, DataFrames, Dates, CSV
+using XLSX, DataFrames, Dates, CSV, Statistics
 
 macro throw(t, args...)
     esc(:(throw($t($(args...)))))
