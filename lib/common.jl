@@ -10,7 +10,7 @@ function read_one_sheet_xlsx(fn)
 
     sheets = XLSX.sheetnames(xls)
 
-    length(sheets)== 1 || @throw DomainError length(sheets) "unexpected number of sheets"
+    length(sheets) == 1 || @throw DomainError length(sheets) "unexpected number of sheets"
 
     return DataFrame(XLSX.gettable(xls[sheets[1]])...)
 end
