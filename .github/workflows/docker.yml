@@ -14,5 +14,5 @@ jobs:
       - name: Build and publish a Docker image for ${{ github.repository }}
         uses: macbre/push-to-ghcr@master
         with:
-          image_name: ${{ github.repository }}
+          image_name: research-luxembourg/covid-reproduction-number-jl
           github_token: ${{ secrets.GITHUB_TOKEN }}
