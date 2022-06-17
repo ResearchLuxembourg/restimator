@@ -71,8 +71,8 @@ CSV.write(
     joinpath(dirname(filename), "Reff_estimate_$(basename(filename)).csv"),
     DataFrame(
         date=dates,
-        Reff_estimate=results[:,1],
-        Reff_50_lo=results[:,2],
-        Reff_50_hi=results[:,3],
+        Reff_estimate=round(results[:,1],digits=2),
+        Reff_50_lo=round(results[:,2],digits=2),
+        Reff_50_hi=round(results[:,3],digits=2),
     ),
 )
