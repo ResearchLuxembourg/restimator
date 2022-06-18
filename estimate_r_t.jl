@@ -39,7 +39,7 @@ C_sat = 0.6
 weekday_effects = [1, 1, 1, 1, 1, C_sat, C_sun]
 
 rate_in_week(date) =
-    Y_at[date] / mean(getindex.(Ref(Y_at), date .+ Day.(1:7) .- Dates.dayofweek(date)))
+    Y_at[date] / mean(getindex.(Ref(Y_at), date .+ Day.((1:7) .- Dates.dayofweek(date))))
 
 Y_at = Dict(dates .=> Y) # lookup
 C = [
