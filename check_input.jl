@@ -21,19 +21,13 @@ current_name = basename(ARGS[1])
 expected_name = "clinical_monitoring_$(today)_cleaned_case_and_hospital_data.xlsx"
 @assert (current_name == expected_name) "Either the date in the uploaded file name is not correct or the name is not following the accepted systematization (got '$current_name', should be '$expected_name')."
 
-# Rename file  
-standard_name = "/input-data.xlsx"
-if standard_name != basename(ARGS[1])
-    mv(input, string(dirname(ARGS[1]),standard_name))
-end
-
 
 #
 # Check basic properties
 #
 
 # Read the input file
-df = read_one_sheet_xlsx(string(dirname(ARGS[1]),standard_name))
+df = read_one_sheet_xlsx(input)
 
 # Check if all columns are present
 required_props = [
