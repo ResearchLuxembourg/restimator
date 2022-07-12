@@ -34,25 +34,24 @@ quirks = [
 Y[indexin(Date.(first.(quirks)), dates)] .+= last.(quirks)
 
 # compensate for weekday variability
-C_mon = 0.3
-C_sun = 0.6
-weekday_effects = [1, 1, 1, 1, 1, C_sun, C_mon]
+C_sun = 0.3
+C_sat = 0.6
+weekday_effects = [1, 1, 1, 1, 1, C_sat, C_sun]
 
-rate_in_week(date) = Y_at[date] / mean(getindex.(Ref(Y_at), date.+Day.(1-Dates.dayofweek(date.+Day.(1)):7-Dates.dayofweek(date.+Day.(1)))))
+rate_in_week(date) =
+    Y_at[date] / mean(getindex.(Ref(Y_at), date .+ Day.((1:7) .- Dates.dayofweek(date))))
 
 Y_at = Dict(dates .=> Y) # lookup
 C = [
     if date < Date("2020-06-01")
         weekday_effects[Dates.dayofweek(date)] / 3.0 #dark number 1
     else
-        mean(rate_in_week.(date.-Week.(1:4))) / 1.5 #dark number 2
-    end
-    for date = df.report_date
-
+        mean(rate_in_week.(date .- Week.(1:4))) / 1.5 #dark number 2
+    end for date in df.report_date
 ]
 
 # apply C quirks
-extra_mondays = [
+extra_sundays = [
     "2020-04-13",
     "2020-05-21",
     "2020-06-01",
@@ -82,15 +81,15 @@ fix_C(date_string, val) = begin
     isnothing(idx) || (C[idx] = val)
 end
 
-fix_C.(extra_mondays, C_mon)
+fix_C.(extra_sundays, C_sun)
 
-fix_C("2021-05-01", C_sun)
+fix_C("2021-05-01", C_sat)
 
-fix_C("2020-12-27", 1.21 * C_mon - 0.21)
-fix_C("2021-01-01", 1.21 * C_mon - 0.21)
-fix_C("2021-05-24", 1.21 * C_mon - 0.21)
+fix_C("2020-12-27", 1.21 * C_sun - 0.21)
+fix_C("2021-01-01", 1.21 * C_sun - 0.21)
+fix_C("2021-05-24", 1.21 * C_sun - 0.21)
 
-fix_C("2021-04-05", 1.3 * C_mon - 0.3)
+fix_C("2021-04-05", 1.3 * C_sun - 0.3)
 
 # simulation parameters
 μ = 0.25 # I -> R transition rate
@@ -103,9 +102,9 @@ initial_infected_var = 250
 
 # measurement error variance
 Ysm = [
-    mean(Y[begin:begin+1]);
-    (Y[begin:end-2] + 2*Y[begin+1:end-1] + Y[begin+2:end]) ./ 4;
-    mean(Y[end-1:end]);
+    mean(Y[begin:begin+1])
+    (Y[begin:end-2] + 2 * Y[begin+1:end-1] + Y[begin+2:end]) ./ 4
+    mean(Y[end-1:end])
 ]
 
 R = (Ysm ./ 25) .^ 2 .* (C[1] ./ C) .^ 2 .+ 1
