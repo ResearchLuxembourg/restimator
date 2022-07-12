@@ -27,7 +27,7 @@ expected_name = "clinical_monitoring_$(today)_cleaned_case_and_hospital_data.xls
 #
 
 # Read the input file
-df = read_one_sheet_xlsx(input)
+df = read_one_sheet_xlsx(ARGS[1])
 
 # Check if all columns are present
 required_props = [:report_date, :new_cases, :new_cases_resident]
