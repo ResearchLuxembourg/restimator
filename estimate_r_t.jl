@@ -130,7 +130,7 @@ P = [
 ]
 
 # run a kalman filter
-@time for D in eachindex(Y)
+for D in eachindex(Y)
     prev = view(X, :, D)
     current = view(X, :, D + 1)
 
@@ -182,11 +182,11 @@ P = [
 end
 
 CSV.write(
-    joinpath(dirname(filename), "Rt_estimate_$(basename(filename)).csv"),
+    outfile("Rt_estimate", "csv"),
     DataFrame(
         date = dates,
-        Rt_estimate = X[4, begin+1:end] ./ μ,
-        standard_deviation = sqrt.(β_err) ./ μ,
+        Rt_estimate = round.(X[4, begin+1:end] ./ μ, digits=2),
+        standard_deviation = round.(sqrt.(β_err) ./ μ, digits=2),
     )[
         19:end,
         :,

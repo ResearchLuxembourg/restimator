@@ -47,7 +47,7 @@ posteriors = Matrix{Float64}(undef, rt_samples, length(cases_smoothed))
 posteriors[:, 1] = prior0
 log_likelihood = 0.0
 
-@time for current_day = 2:length(cases_smoothed)
+for current_day = 2:length(cases_smoothed)
     previous_day = current_day - 1
     current_prior = process_matrix * posteriors[:, previous_day]
     numerator = likelihoods[:, previous_day] .* current_prior
@@ -73,12 +73,34 @@ maxima = findmax.(eachcol(posteriors))
 results = rt_max .* [map(last, maxima) map(first, ranges) map(last, ranges)] ./ rt_samples
 dates = (start_date + Day(discard_dates)) .+ Day.(eachindex(ranges))
 
-CSV.write(
-    joinpath(dirname(filename), "Reff_estimate_$(basename(filename)).csv"),
-    DataFrame(
+x = DataFrame(
         date = dates,
-        Reff_estimate = round(results[:, 1], digits = 2),
-        Reff_50_lo = round(results[:, 2], digits = 2),
-        Reff_50_hi = round(results[:, 3], digits = 2),
-    ),
+        Reff_estimate = round.(results[:, 1], digits = 2),
+        Reff_50_lo = round.(results[:, 2], digits = 2),
+        Reff_50_hi = round.(results[:, 3], digits = 2),
+    )
+
+CSV.write(
+    outfile("Reff_estimate", "csv"),
+    x,
 )
+
+# Plot Reff for resident's data
+
+using CairoMakie, PlotUtils
+
+f = Figure()
+ax = Axis(f[1,1], title="Real-time effective Rt for LU")
+
+ticks = filter(d -> day(d) == 1, x.date)
+poss = datetime2rata.(x.date)
+ax.xticks[] = (datetime2rata.(ticks), Dates.format.(ticks, "yyyy-mm"))
+ax.xticklabelrotation = π/3
+ax.xticklabelsize = 12
+
+ylims!(0,maximum(x.Reff_estimate)*1.04)
+band!(poss, x.Reff_50_lo, x.Reff_50_hi; color="#cccccc")
+lines!(poss, x.Reff_estimate; color="black")
+scatter!(poss, x.Reff_estimate; color=x.Reff_estimate,markersize=7,colormap=:RdBu,colorrange=(2,0),strokewidth=0.5)
+
+save(outfile("Reff_residents","pdf"), f)
