@@ -7,7 +7,7 @@ include("lib/common.jl")
 #
 
 # Single input provided
-@assert (length(ARGS)==1) "Error: Expects a single filename argument"
+@assert (length(ARGS) == 1) "Error: Expects a single filename argument"
 
 # Input file exists
 @assert (isfile(ARGS[1])) "Error: File does not exists"
@@ -30,11 +30,7 @@ expected_name = "clinical_monitoring_$(today)_cleaned_case_and_hospital_data.xls
 df = read_one_sheet_xlsx(input)
 
 # Check if all columns are present
-required_props = [
-    :report_date,
-    :new_cases,
-    :new_cases_resident,
-]
+required_props = [:report_date, :new_cases, :new_cases_resident]
 
 for p in required_props
     @assert (p in propertynames(df)) "Error: Column $p must be present in data"
@@ -42,8 +38,8 @@ end
 
 # check if new cases are okay
 for col in [:new_cases, :new_cases_resident]
-    @assert all(typeof.(df[:,col]) .== Int64) "Error: Data in $col must be integer numbers"
-    @assert all(df[:,col] .>= 0) "Error: New cases in $col must not be negative"
+    @assert all(typeof.(df[:, col]) .== Int64) "Error: Data in $col must be integer numbers"
+    @assert all(df[:, col] .>= 0) "Error: New cases in $col must not be negative"
 end
 
 @assert all(df.new_cases .>= df.new_cases_resident) "Error: Total cases should be greater than resident cases: are there missing data?"
@@ -61,11 +57,11 @@ first_report, last_report = extrema(df.report_date)
 last_entry = Dates.today() - Day(1)
 @assert (last_report == last_entry) "Error: Missing data point of today (expected $last_entry, was: $last_report)"
 
-since_last_entry = Dates.today() - last_report 
+since_last_entry = Dates.today() - last_report
 @assert (since_last_entry < Week(1)) "Warning: Last entry is older than 1 week"
 
 # Check date continuity
-expected_dates = [first_report+Day(i) for i = 0:Day(last_report-first_report).value]
+expected_dates = [first_report + Day(i) for i = 0:Day(last_report - first_report).value]
 @assert expected_dates == sort(df.report_date) "Error: Data series not complete from beginning"
 
 @info "Check finished OK."

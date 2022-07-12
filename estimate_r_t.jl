@@ -38,17 +38,22 @@ C_mon = 0.3
 C_sun = 0.6
 weekday_effects = [1, 1, 1, 1, 1, C_sun, C_mon]
 
-rate_in_week(date) = Y_at[date] / mean(getindex.(Ref(Y_at), date.+Day.(1-Dates.dayofweek(date.+Day.(1)):7-Dates.dayofweek(date.+Day.(1)))))
+rate_in_week(date) =
+    Y_at[date] / mean(
+        getindex.(
+            Ref(Y_at),
+            date .+
+            Day.(1-Dates.dayofweek(date .+ Day.(1)):7-Dates.dayofweek(date .+ Day.(1))),
+        ),
+    )
 
 Y_at = Dict(dates .=> Y) # lookup
 C = [
     if date < Date("2020-06-01")
         weekday_effects[Dates.dayofweek(date)] / 3.0 #dark number 1
     else
-        mean(rate_in_week.(date.-Week.(1:4))) / 1.5 #dark number 2
-    end
-    for date = df.report_date
-
+        mean(rate_in_week.(date .- Week.(1:4))) / 1.5 #dark number 2
+    end for date in df.report_date
 ]
 
 # apply C quirks
@@ -103,9 +108,9 @@ initial_infected_var = 250
 
 # measurement error variance
 Ysm = [
-    mean(Y[begin:begin+1]);
-    (Y[begin:end-2] + 2*Y[begin+1:end-1] + Y[begin+2:end]) ./ 4;
-    mean(Y[end-1:end]);
+    mean(Y[begin:begin+1])
+    (Y[begin:end-2] + 2 * Y[begin+1:end-1] + Y[begin+2:end]) ./ 4
+    mean(Y[end-1:end])
 ]
 
 R = (Ysm ./ 25) .^ 2 .* (C[1] ./ C) .^ 2 .+ 1
