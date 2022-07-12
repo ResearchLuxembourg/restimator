@@ -1,40 +1,67 @@
 
 include("lib/common.jl")
 
-@assert (length(ARGS) == 1) "expects a single filename argument"
 
+#
+# Initial checks on what the input file looks like
+#
+
+# Single input provided
+@assert (length(ARGS) == 1) "Error: Expects a single filename argument"
+
+# Input file exists
+@assert (isfile(ARGS[1])) "Error: File does not exists"
+
+# Input file is Excel 
+@assert (split(ARGS[1], ".")[end] == "xlsx") "Error: Incorrect input file format. Expected Excel .xlsx, received another"
+
+# Check file name
+today = Dates.format(Dates.today(), "yyyymmdd")
+current_name = basename(ARGS[1])
+expected_name = "clinical_monitoring_$(today)_cleaned_case_and_hospital_data.xlsx"
+@assert (current_name == expected_name) "Either the date in the uploaded file name is not correct or the name is not following the accepted systematization (got '$current_name', should be '$expected_name')."
+
+
+#
+# Check basic properties
+#
+
+# Read the input file
 df = read_one_sheet_xlsx(ARGS[1])
 
-# check if all columns are present
+# Check if all columns are present
 required_props = [:report_date, :new_cases, :new_cases_resident]
 
 for p in required_props
-    @assert (p in propertynames(df)) "Column $p must be present in data"
+    @assert (p in propertynames(df)) "Error: Column $p must be present in data"
 end
 
 # check if new cases are okay
 for col in [:new_cases, :new_cases_resident]
-    @assert all(typeof.(df[:, col]) .== Int64) "Data in $col must be integer numbers"
-    @assert all(df[:, col] .>= 0) "New cases in $col must not be negative"
+    @assert all(typeof.(df[:, col]) .== Int64) "Error: Data in $col must be integer numbers"
+    @assert all(df[:, col] .>= 0) "Error: New cases in $col must not be negative"
 end
 
-@assert all(df.new_cases .>= df.new_cases_resident) "Total cases should be greater than resident cases (data are missing?)"
+@assert all(df.new_cases .>= df.new_cases_resident) "Error: Total cases should be greater than resident cases: are there missing data?"
 
-# check the dates
+#
+# Check the dates in the file
+#
+
 first_report, last_report = extrema(df.report_date)
 
-#TODO there was 28 in the python script but I got data with 24, is that right?
-@assert (first_report == Date("2020-02-24")) "Reports must start at an expected date. Is the data corrupted?"
+# Check that the first date considered in database is consistent 
+@assert (first_report == Date("2020-02-24")) "Warning: Reports should start from 2020-02-24. Is the data corrupted?"
+
+# Check presence of last datapoint
+last_entry = Dates.today() - Day(1)
+@assert (last_report == last_entry) "Error: Missing data point of today (expected $last_entry, was: $last_report)"
 
 since_last_entry = Dates.today() - last_report
-@assert (since_last_entry >= Day(0)) "Last entry must not be in the future!"
+@assert (since_last_entry < Week(1)) "Warning: Last entry is older than 1 week"
 
-since_last_entry < Week(1) || @warn "Last entry is older than 1 week!"
-
-@info "Age of the last entry is $since_last_entry"
-
-# check date continuity
+# Check date continuity
 expected_dates = [first_report + Day(i) for i = 0:Day(last_report - first_report).value]
-@assert expected_dates == sort(df.report_date) "Some days are missing!"
+@assert expected_dates == sort(df.report_date) "Error: Data series not complete from beginning"
 
 @info "Check finished OK."
