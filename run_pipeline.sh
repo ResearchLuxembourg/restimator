@@ -2,7 +2,7 @@
 
 . /etc/profile
 
-FILE=`find input/ -type f`
+FILE=`find input/ -name '*.xlsx' -type f`
 [ -f "$FILE" ] || {
 	echo $0: could not find any input >&2
 	exit 1
@@ -10,14 +10,16 @@ FILE=`find input/ -type f`
 
 log () {
 	mkdir -p logs/
-	tee "logs/$1-`basename \"$FILE\"`"
+	tee "logs/$1-`basename \"$FILE\"`.log"
 }
 
-IMAGE=researchluxembourg/covid-reproduction-number
-MOUNT="-v $PWD/input:/tool/input -v $PWD/output:/tool/output"
-DOCKER="docker run --user `id -u`:`id -g` --rm $MOUNT $IMAGE julia --project "
+echo "found $FILE" | log find_input
 
-mkdir -p output
+IMAGE=researchluxembourg/covid-reproduction-number
+MOUNT="-v $PWD/input:/tool/input -v $PWD/output:/tool/output -v $PWD/logs:/tool/logs "
+DOCKER="docker run --rm $MOUNT $IMAGE julia --project "
+
+mkdir -p output logs
 export RESTIMATOR_OUTDIR=output
 
 if $DOCKER check_input.jl "$FILE" | log check
