@@ -16,9 +16,10 @@ include("lib/common.jl")
 @assert (split(ARGS[1], ".")[end] == "xlsx") "Error: Incorrect input file format. Expected Excel .xlsx, received another"
 
 # Check file name
-today = Dates.format(Dates.today(), "yyyymmdd")
+today = Dates.today()
+today_str = Dates.format(today, "yyyymmdd")
 current_name = basename(ARGS[1])
-expected_name = "clinical_monitoring_$(today)_cleaned_case_and_hospital_data.xlsx"
+expected_name = "clinical_monitoring_$(today_str)_cleaned_case_and_hospital_data.xlsx"
 @assert (current_name == expected_name) "Either the date in the uploaded file name is not correct or the name is not following the accepted systematization (got '$current_name', should be '$expected_name')."
 
 
@@ -54,11 +55,11 @@ first_report, last_report = extrema(df.report_date)
 @assert (first_report == Date("2020-02-24")) "Warning: Reports should start from 2020-02-24. Is the data corrupted?"
 
 # Check presence of last datapoint
-last_entry = Dates.today() - Day(1)
+last_entry = today - Day(1)
 @assert (last_report == last_entry) "Error: Missing data point of today (expected $last_entry, was: $last_report)"
 
-since_last_entry = Dates.today() - last_report
-@assert (since_last_entry < Week(1)) "Warning: Last entry is older than 1 week"
+since_last_entry = today - last_report
+@assert (since_last_entry < Week(1)) "Last entry is older than 1 week"
 
 # Check date continuity
 expected_dates = [first_report + Day(i) for i = 0:Day(last_report - first_report).value]
