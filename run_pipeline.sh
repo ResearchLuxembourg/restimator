@@ -4,7 +4,7 @@
 
 FILE=`find input/ -name '*.xlsx' -type f`
 [ -f "$FILE" ] || {
-	echo $0: could not find any input >&2
+	echo $0: expected a single .xlsx file in input directory >&2
 	exit 1
 }
 
