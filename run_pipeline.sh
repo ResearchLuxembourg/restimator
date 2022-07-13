@@ -15,12 +15,12 @@ log () {
 
 IMAGE=researchluxembourg/covid-reproduction-number
 MOUNT="-v $PWD/input:/tool/input -v $PWD/output:/tool/output"
-DOCKER="docker run --rm $MOUNT $IMAGE julia"
+DOCKER="docker run --user `id -u`:`id -g` --rm $MOUNT $IMAGE julia --project "
 
 mkdir -p output
 export RESTIMATOR_OUTDIR=output
 
-if $DOCKER check_input.jl /"$FILE" | log check
+if $DOCKER check_input.jl "$FILE" | log check
 then
 	$DOCKER estimate_r_t.jl "$FILE" | log rt
 	$DOCKER estimate_r_eff.jl "$FILE" | log reff
