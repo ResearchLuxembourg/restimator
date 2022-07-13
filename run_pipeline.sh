@@ -14,7 +14,7 @@ log () {
 }
 
 IMAGE=researchluxembourg/covid-reproduction-number
-MOUNT="-v $PWD/input:/input"
+MOUNT="-v $PWD/input:/tool/input -v $PWD/output:/tool/output"
 DOCKER="docker run --rm $MOUNT $IMAGE julia"
 
 mkdir -p output
