@@ -1,4 +1,4 @@
-# REstimator -- estimator of R(t) for COVID-19
+# REstimator – estimator of R(t) for COVID-19
 
 ## Brief explanation of the indicator
 
@@ -46,10 +46,10 @@ repository.
 
 You need `julia` installed, preferably a version higher than 1.6.
 
-You can run Julia in the directory of CovidReproductionNumber.jl, using the project environment as:
+You can run Julia in the directory of `restimator`, using the project environment as:
 
 ```sh
-cd CovidReproductionNumber.jl
+cd restimator
 julia --project=.
 ```
 
@@ -75,7 +75,7 @@ You may get an output like this (or eventually an error with a description of th
 
 ```
 ┌ Warning: Last entry is older than 1 week!
-└ @ Main ~/work/CovidReproductionNumber.jl/check_input.jl:36
+└ @ Main ~/work/restimator/check_input.jl:36
 [ Info: Age of the last entry is 136 days
 [ Info: Check finished OK.
 ```
@@ -98,6 +98,7 @@ input/Rt_estimate_data-20220103.xlsx.csv
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
 - [Daniele Proverbio](https://github.com/daniele-proverbio): R_eff code development, website ideation and content creation
 - [Atte Aalto](https://github.com/AtteAalto): R_t code development
+- [Mirek Kratochvíl](https://github.com/exaexa): Julia port
 - [Laurent Heirendt](https://github.com/laurentheirendt), [Jacek Leboida](https://github.com/jLebioda), [Christophe Trefois](https://github.com/trefex) and the LCSB R3 team: docker and website development and deployment
 
    <img src="logos/unilu.svg" alt="logos" height="100"/>  &nbsp; &nbsp;    <img src="logos/lcsb.svg" alt="logos" height="100"/> &nbsp; &nbsp; <img src="logos/res_lux.png" alt="logos" height="100"/>  
