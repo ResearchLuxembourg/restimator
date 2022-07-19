@@ -64,18 +64,18 @@ This should install the necessary Julia packages.
 
 We assume your input is placed in `input/data-20220103.xlsx`. The input excel
 file must contain a single sheet with several correctly marked columns. You can
-check the suitability of the input file using script `check_input.jl`, as
-follows:
+check the suitability of the input file using script
+`components/check_input.jl`, as follows:
 
 ```sh
-julia --project=. check_input.jl input/data-20220103.xlsx
+julia --project=. components/check_input.jl input/data-20220103.xlsx
 ```
 
 You may get an output like this (or eventually an error with a description of the problem):
 
 ```
 ┌ Warning: Last entry is older than 1 week!
-└ @ Main ~/work/restimator/check_input.jl:36
+└ @ Main ~/work/restimator/components/check_input.jl:36
 [ Info: Age of the last entry is 136 days
 [ Info: Check finished OK.
 ```
@@ -83,8 +83,8 @@ You may get an output like this (or eventually an error with a description of th
 Reff and Rt analyses may be run as follows:
 
 ```sh
-julia --project=. estimate_r_eff.jl input/data-20220103.xlsx
-julia --project=. estimate_r_t.jl input/data-20220103.xlsx
+julia --project=. components/estimate_r_eff.jl input/data-20220103.xlsx
+julia --project=. components/estimate_r_t.jl input/data-20220103.xlsx
 ```
 
 The output should be generated into corresponding files:
