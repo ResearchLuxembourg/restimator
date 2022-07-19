@@ -15,7 +15,7 @@ log () {
 
 echo "found $FILE" | log find_input
 
-IMAGE=researchluxembourg/covid-reproduction-number
+IMAGE=researchluxembourg/restimator
 MOUNT="-v $PWD/input:/tool/input -v $PWD/output:/tool/output -v $PWD/logs:/tool/logs "
 DOCKER="docker run --rm $MOUNT $IMAGE julia --project "
 
