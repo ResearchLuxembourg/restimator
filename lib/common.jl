@@ -16,3 +16,8 @@ function read_one_sheet_xlsx(fn)
 end
 
 normalize!(x; sum_args...) = x ./= sum(x; sum_args...)
+
+output_directory = get(ENV, "RESTIMATOR_OUTDIR", "output")
+
+outfile(tag, suffix) =
+    joinpath(output_directory, "$(Dates.format(today(), "yyyy-mm-dd"))_$tag.$suffix")
