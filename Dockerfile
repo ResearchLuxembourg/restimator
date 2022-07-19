@@ -2,7 +2,6 @@ FROM julia
 
 ADD Project.toml /tool/
 ADD components /tool/components
-ADD lib /tool/lib
 WORKDIR /tool
 
 RUN julia --project=. -e 'import Pkg; Pkg.instantiate();'
