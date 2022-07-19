@@ -1,6 +1,7 @@
 FROM julia
 
-ADD Project.toml *.jl /tool/
+ADD Project.toml /tool/
+ADD components /tool/components
 ADD lib /tool/lib
 WORKDIR /tool
 
