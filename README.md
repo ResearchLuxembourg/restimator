@@ -1,4 +1,22 @@
-# Estimator for COVID-19 R(t)
+# REstimator – estimator of R(t) for COVID-19
+
+## Brief explanation of the indicator
+
+And related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
+
+### R0
+
+The “basic reproduction number” at the beginning of epidemic (time "zero"). It represents the average number of cases each infected person will likely cause if no action is taken and the whole population is susceptible. It is disease and variant-specific.
+
+### R_t
+
+As the epidemic evolves and measures are taken, the “reproduction number” might vary in time. Likewise, from the very first value R0, the index evolves in time, tracking the infectious curve. In this regard, R0 is an upper value for R_t.
+
+### R_eff
+
+The “effective reproduction number”, signifying the average number of cases each infected person will likely cause during the epidemic. It evolves in time like R_t, but is scaled according to the true number of susceptible people (while R_t assumes that 100% of the population is susceptible).
+
+R_eff is used as an epidemic “thermometer”: R_eff<1 indicates a decreasing curve of daily infections (sub-linear increase of cumulative cases), R_eff=1 indicates a stable curve (linear increase of cumulative cases), R_eff>1 indicates a growing daily curve (exponential increase of cumulative cases). The higher R_eff, the more pronounced the exponential growth.
 
 ## Input
 
@@ -13,40 +31,71 @@ Excel (.xlsx) file with at least the following columns, ordered chronologically 
 - R_eff, calculated for each day data are available (reported as .csv file and pdf plot)
 - R(t), calculated for each day data are available (reported as .csv file)
 
-## Brief explanation of the indicator
+## How-to
 
-and related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
+### Automated way
 
-### R0
+If you place your `.xlsx` input into directory `input`, everything can be run
+just by executing `./run_pipeline.sh`.
 
-the “basic reproduction number” at the beginning of epidemic (time "zero"). It represents the average number of cases each infected person will likely cause if no action is taken and the whole population is susceptible. It is disease and variant-specific.
+This requires a Docker image `researchluxembourg/restimator` pulled or built --
+you can pull it from the github packages, or build manually from this
+repository.
 
-### R_t
+### Install dependencies
 
-as the epidemic evolves and measures are taken, the “reproduction number” might vary in time. Likewise, from the very first value R0, the index evolves in time, tracking the infectious curve. In this regard, R0 is an upper value for R_t.
+You need `julia` installed, preferably a version higher than 1.6.
 
-### R_eff
+You can run Julia in the directory of `restimator`, using the project environment as:
 
-the “effective reproduction number”, signifying the average number of cases each infected person will likely cause during the epidemic. It evolves in time like R_t, but is scaled according to the true number of susceptible people (while R_t assumes that 100% of the population is susceptible).
+```sh
+cd restimator
+julia --project=.
+```
 
-R_eff is used as an epidemic “thermometer”: R_eff<1 indicates a decreasing curve of daily infections (sub-linear increase of cumulative cases), R_eff=1 indicates a stable curve (linear increase of cumulative cases), R_eff>1 indicates a growing daily curve (exponential increase of cumulative cases). The higher R_eff, the more pronounced the exponential growth.
+After that, type
+```julia
+Pkg.instantiate()
+```
 
-## Estimation of R_eff and R_t
+This should install the necessary Julia packages.
 
-### R_eff
+### Run the R estimators
 
-R_eff is estimated from the data following a Bayesian inference algorithm. In a nutshell, it estimates the most likely R_eff that could cause k cases today, given k' cases in the past.
+We assume your input is placed in `input/filename.xlsx`. The input excel
+file must contain a single sheet with several correctly marked columns. You can
+check the suitability of the input file using script
+`components/check_input.jl`, as follows:
 
-The algorithm returns a most likely value and its associated 50% credible interval (where there is the highest confidence that the true value might lie).
+```sh
+julia --project=. components/check_input.jl input/filename.xlsx
+```
 
-The present implementation builds upon a former implementation from the [rtcovidlive project](https://github.com/rtcovidlive/).
+You may get an output like this (or eventually an error with a description of the problem; for basic troubleshooting, refer to the section below):
 
-### R_t
+```
+┌ Warning: Last entry is older than 1 week!
+└ @ Main ~/work/restimator/components/check_input.jl:36
+[ Info: Age of the last entry is 136 days
+[ Info: Check finished OK.
+```
 
-R_t is estimated by running a Kalmar filter estimator with a nonlinear SIR-based model as kernel. The code was entirely built in-house.
+Reff and Rt analyses may be run as follows:
 
-## Potential sources of code errors
-The pipeline might raise errors in case the initial check on data quality is not satisfied. For basic troubleshooting, refer to this section.
+```sh
+julia --project=. components/estimate_r_eff.jl input/filename.xlsx
+julia --project=. components/estimate_r_t.jl input/filename.xlsx
+```
+
+Without errors, the output is generated into corresponding files:
+```
+input/date_Reff_estimate.csv
+input/date_Rt_estimate.csv
+```
+
+## Basic troubleshooting
+
+The pipeline might raise errors if the initial check on data quality is not satisfied. To understand common sources of errors and warnings, refer to this section.
 
 - File does not exist: error in loading the input file.
 - Incorrect file format: expected format is Excel .xlsx.
@@ -58,67 +107,15 @@ The pipeline might raise errors in case the initial check on data quality is not
 - Last datapoint missing (relative to the latest detection date of 'yesterday').
 
 
-## How to run the pipeline
-
-
-### MATLAB license
-
-The license for MATLAB must be downloaded from [Mathworks](https://mathworks.com) after activation of the hostid of the container.
-
-The hostid is displayed after running the pipeline for the first time (see instructions below).
-
-Once the license (`license.lic`) is available locally, the following environment variable as to be set:
-
-```bash
-export MATLAB_LICENSE=<location of license file>
-```
-
-Then, the pipeline can be run. Please note that each time the container is built, the hostid changes, and so is the license.
-Also, the hostid may differ between different builts of the container.
-
-### Docker Compose (preferred)
-
-If [Docker Compose](https://docs.docker.com/compose/) is available, you can run the `rt` pipeline using:
-
-```bash
-docker compose run rt
-```
-
-Similarly, you can run the `reff` pipeline using:
-
-```bash
-docker compose run reff
-```
-
-The full pipeline can be run using:
-
-```bash
-docker compose up
-```
-
-### Makefile
-
-The pipeline can be run using any of the following `make` commands:
-
-| Command         | Purpose                                               |
-|-----------------|-------------------------------------------------------|
-| make all        | clean first, then build and run the full pipeline     |
-| make build      | build the pipeline                                    |
-| make build_reff | build the `R_eff` pipeline                            |
-| make build_rt   | build the `R_t` pipeline                              |
-| make run        | run the pipeline                                      |
-| make reff       | run the partial pipeline to generate `R_eff` (Python) |
-| make rt         | run the partial pipeline to generate `R_t` (Matlab)   |
-| make clean      | clean generated assets                                |
-
 ## Credits and contacts
 
 - Research Luxembourg COVID-19 Taskforce WP6, in the person of Alexander Skupin: supervision and coordination. Contact: alexander.skupin@uni.lu.
 - [Daniele Proverbio](https://github.com/daniele-proverbio): R_eff code development, website ideation and content creation
 - [Atte Aalto](https://github.com/AtteAalto): R_t code development
+- [Mirek Kratochvíl](https://github.com/exaexa): Julia port
 - [Laurent Heirendt](https://github.com/laurentheirendt), [Jacek Leboida](https://github.com/jLebioda), [Christophe Trefois](https://github.com/trefex) and the LCSB R3 team: docker and website development and deployment
 
-   <img src="docs/unilu.svg" alt="logos" height="100"/>  &nbsp; &nbsp;    <img src="docs/lcsb.svg" alt="logos" height="100"/> &nbsp; &nbsp; <img src="docs/res_lux.png" alt="logos" height="100"/>  
+   <img src="logos/unilu.svg" alt="logos" height="100"/>  &nbsp; &nbsp;    <img src="logos/lcsb.svg" alt="logos" height="100"/> &nbsp; &nbsp; <img src="logos/res_lux.png" alt="logos" height="100"/>  
 
 
 For basic troubleshooting of raised warnings and errors, check the readme section first.
