@@ -22,11 +22,11 @@ DOCKER="docker run --rm $MOUNT $IMAGE julia --project "
 mkdir -p output logs
 export RESTIMATOR_OUTDIR=output
 
-if $DOCKER components/check_input.jl "$FILE" | log check
+if $DOCKER components/check_input.jl "$FILE"
 then
-	$DOCKER components/estimate_r_t.jl "$FILE" | log rt
-	$DOCKER components/estimate_r_eff.jl "$FILE" | log reff
+	$DOCKER components/estimate_r_t.jl "$FILE" 2>&1 | log rt
+	$DOCKER components/estimate_r_eff.jl "$FILE" 2>&1 | log reff
 else
 	echo $0: check failed >&2
 	exit 1
-fi
+fi 2>&1 | log check
