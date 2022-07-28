@@ -7,3 +7,12 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 PlotUtils = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 RollingFunctions = "b0e4dd01-7b14-53d8-9b45-175a3e362653"
 XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"
+
+[compat]
+CSV = "0.10"
+CairoMakie = "0.8"
+DataFrames = "1.3"
+Distributions = "0.25"
+PlotUtils = "1.3"
+RollingFunctions = "0.6"
+XLSX = "0.7"
