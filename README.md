@@ -2,19 +2,19 @@
 
 ## Brief explanation of the indicator
 
-and related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
+And related ones (source: science.lu, "Coronavirus technical terms – explained by scientists from Luxembourg" )
 
 ### R0
 
-the “basic reproduction number” at the beginning of epidemic (time "zero"). It represents the average number of cases each infected person will likely cause if no action is taken and the whole population is susceptible. It is disease and variant-specific.
+The “basic reproduction number” at the beginning of epidemic (time "zero"). It represents the average number of cases each infected person will likely cause if no action is taken and the whole population is susceptible. It is disease and variant-specific.
 
 ### R_t
 
-as the epidemic evolves and measures are taken, the “reproduction number” might vary in time. Likewise, from the very first value R0, the index evolves in time, tracking the infectious curve. In this regard, R0 is an upper value for R_t.
+As the epidemic evolves and measures are taken, the “reproduction number” might vary in time. Likewise, from the very first value R0, the index evolves in time, tracking the infectious curve. In this regard, R0 is an upper value for R_t.
 
 ### R_eff
 
-the “effective reproduction number”, signifying the average number of cases each infected person will likely cause during the epidemic. It evolves in time like R_t, but is scaled according to the true number of susceptible people (while R_t assumes that 100% of the population is susceptible).
+The “effective reproduction number”, signifying the average number of cases each infected person will likely cause during the epidemic. It evolves in time like R_t, but is scaled according to the true number of susceptible people (while R_t assumes that 100% of the population is susceptible).
 
 R_eff is used as an epidemic “thermometer”: R_eff<1 indicates a decreasing curve of daily infections (sub-linear increase of cumulative cases), R_eff=1 indicates a stable curve (linear increase of cumulative cases), R_eff>1 indicates a growing daily curve (exponential increase of cumulative cases). The higher R_eff, the more pronounced the exponential growth.
 
@@ -62,16 +62,16 @@ This should install the necessary Julia packages.
 
 ### Run the R estimators
 
-We assume your input is placed in `input/data-20220103.xlsx`. The input excel
+We assume your input is placed in `input/filename.xlsx`. The input excel
 file must contain a single sheet with several correctly marked columns. You can
 check the suitability of the input file using script
 `components/check_input.jl`, as follows:
 
 ```sh
-julia --project=. components/check_input.jl input/data-20220103.xlsx
+julia --project=. components/check_input.jl input/filename.xlsx
 ```
 
-You may get an output like this (or eventually an error with a description of the problem):
+You may get an output like this (or eventually an error with a description of the problem; for basic troubleshooting, refer to the section below):
 
 ```
 ┌ Warning: Last entry is older than 1 week!
@@ -83,15 +83,29 @@ You may get an output like this (or eventually an error with a description of th
 Reff and Rt analyses may be run as follows:
 
 ```sh
-julia --project=. components/estimate_r_eff.jl input/data-20220103.xlsx
-julia --project=. components/estimate_r_t.jl input/data-20220103.xlsx
+julia --project=. components/estimate_r_eff.jl input/filename.xlsx
+julia --project=. components/estimate_r_t.jl input/filename.xlsx
 ```
 
-The output should be generated into corresponding files:
+Without errors, the output is generated into corresponding files:
 ```
-input/Reff_estimate_data-20220103.xlsx.csv
-input/Rt_estimate_data-20220103.xlsx.csv
+input/date_Reff_estimate.csv
+input/date_Rt_estimate.csv
 ```
+
+## Basic troubleshooting
+
+The pipeline might raise errors if the initial check on data quality is not satisfied. To understand common sources of errors and warnings, refer to this section.
+
+- File does not exist: error in loading the input file.
+- Incorrect file format: expected format is Excel .xlsx.
+- Incorrect file name: the _de facto_ agreed file naming is "clinical_monitoring_'+DATEOFTODAY[yyyymmdd]+_cleaned_case_and_hospital_data".
+- Missing daily data: the program needs a data entry for each day, as a positive integer.
+- Typos in the input file (in particular, related to the input columns labels) or missing input column: expected input columns are "report date", "new_cases", "new_cases_resident".
+- Inconsistency: daily cases for residents should be less or equal to total new daily cases.
+- Retrospectively changed data. To provide consistent results, the program needs initial conditions: the data history should not be altered, starting from 2020-02-28.
+- Last datapoint missing (relative to the latest detection date of 'yesterday').
+
 
 ## Credits and contacts
 
