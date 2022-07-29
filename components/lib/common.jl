@@ -12,7 +12,7 @@ function read_one_sheet_xlsx(fn)
 
     length(sheets) == 1 || @throw DomainError length(sheets) "unexpected number of sheets"
 
-    return DataFrame(XLSX.gettable(xls[sheets[1]])...)
+    return DataFrame(XLSX.gettable(xls[sheets[1]]))
 end
 
 normalize!(x; sum_args...) = x ./= sum(x; sum_args...)
