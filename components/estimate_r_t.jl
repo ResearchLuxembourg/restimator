@@ -14,7 +14,7 @@ df = df[sortperm(df.report_date), :]
 df = df[df.report_date.>=start_date, :]
 
 Y = Int.(df.new_cases_resident)
-dates = df.report_date
+dates = df.report_date + Day(1)
 
 # apply quirks
 quirks = [
