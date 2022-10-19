@@ -1,4 +1,4 @@
-FROM julia
+FROM julia:1.8.0-bullseye
 
 ADD Project.toml /tool/
 ADD components /tool/components
