@@ -185,8 +185,8 @@ CSV.write(
     outfile("Rt_estimate", "csv"),
     DataFrame(
         date = dates,
-        Rt_estimate = round.(X[4, begin+1:end] ./ μ, digits=2),
-        standard_deviation = round.(sqrt.(β_err) ./ μ, digits=2),
+        Rt_estimate = round.(X[4, begin+1:end] ./ μ, digits = 2),
+        standard_deviation = round.(sqrt.(β_err) ./ μ, digits = 2),
     )[
         19:end,
         :,

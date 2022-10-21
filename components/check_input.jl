@@ -20,7 +20,8 @@ today = Dates.today()
 today_str = Dates.format(today, "yyyymmdd")
 current_name = basename(ARGS[1])
 expected_name = "clinical_monitoring_$(today_str)_cleaned_case_and_hospital_data.xlsx"
-current_name == expected_name || @warn "Either the date in the uploaded file name is not correct or the name is not following the accepted systematization (got '$current_name', should be '$expected_name')."
+current_name == expected_name ||
+    @warn "Either the date in the uploaded file name is not correct or the name is not following the accepted systematization (got '$current_name', should be '$expected_name')."
 
 
 #
