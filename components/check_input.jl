@@ -50,19 +50,47 @@ end
 #
 
 first_report, last_report = extrema(df.report_date)
+expected_first_report = Date("2020-02-24")
 
 # Check that the first date considered in database is consistent 
-@assert (first_report == Date("2020-02-24")) "Warning: Reports should start from 2020-02-24. Is the data corrupted?"
+#@assert (first_report == Date("2020-02-24")) "Warning: Reports should start from 2020-02-24. Is the data corrupted?"
+# ...we replaced this with "dates outside" check below.
 
 # Check presence of last datapoint
 last_entry = today - Day(1)
-@assert (last_report == last_entry) "Error: Missing data point of today (expected $last_entry, was: $last_report)"
+@assert last_report == last_entry "Error: Missing data point of today (expected $last_entry, was: $last_report)"
 
-since_last_entry = today - last_report
-@assert (since_last_entry < Week(1)) "Last entry is older than 1 week"
+# This served as a warning but it now completely deprecated by the above.
+#since_last_entry = today - last_report
+#@assert (since_last_entry < Week(1)) "Error: Last entry is older than 1 week"
 
 # Check date continuity
-expected_dates = [first_report + Day(i) for i = 0:Day(last_report - first_report).value]
-@assert expected_dates == sort(df.report_date) "Error: Data series not complete from beginning"
+date_counts =
+    Dict([(expected_first_report + Day(i) => 0) for i = 0:Day(last_entry - expected_first_report).value])
+dates_outside = Set{Date}()
+for d in df.report_date
+    if haskey(date_counts, d)
+        date_counts[d] += 1
+    else
+        push!(dates_outside, d)
+    end
+end
+dates_outside = collect(dates_outside)
+dates_missing = [d for (d, v) = date_counts if v == 0]
+dates_duplicate = [d for (d, v) = date_counts if v > 1]
+
+function clamp!(x)
+    length(x) <= 5 || resize!(x, 5)
+end
+
+clamp!(dates_outside)
+clamp!(dates_missing)
+clamp!(dates_duplicate)
+
+printdates(x) = join(x, ", ")
+
+@assert isempty(dates_outside) "Error: dates outside the expected interval: $(printdates(dates_outside))"
+@assert isempty(dates_missing) "Error: expected dates missing: $(printdates(dates_missing))"
+@assert isempty(dates_duplicate) "Error: duplicate entries for dates: $(printdates(dates_duplicate))"
 
 @info "Check finished OK."
